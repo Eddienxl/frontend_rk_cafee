@@ -36,11 +36,18 @@ class ApiConstants {
 
   // ==================== BAHAN BAKU ENDPOINTS ====================
   static const String bahan = '/bahan';
+  static const String bahanBulk = '/bahan/bulk';
 
   // ==================== BOM ENDPOINTS ====================
   static const String bom = '/bom';
+  static const String bomBulk = '/bom/bulk';
+  static const String bomByMenu = '/bom/menu'; // + /:id_menu
 
   // ==================== RIWAYAT STOK ENDPOINTS ====================
-  static const String riwayatStok = '/riwayat-stok';
+  static const String riwayat = '/riwayat';
+  static const String riwayatByBahan = '/riwayat'; // + /:id_bahan
+  
+  // ==================== LAPORAN ENDPOINTS ====================
+  static const String laporanPenjualan = '/laporan/penjualan';
 }
 

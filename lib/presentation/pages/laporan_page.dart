@@ -102,19 +102,19 @@ class _LaporanPageState extends State<LaporanPage> {
           padding: const EdgeInsets.all(AppConstants.paddingSmall),
           child: Column(
             children: [
-              // Row 1: Pendapatan & Transaksi
+              // Row 1: Omzet & Total Order
               Row(
                 children: [
                   _buildSummaryCard(
-                    'Total Pendapatan',
-                    provider.totalPendapatanFormatted,
+                    'Total Omzet',
+                    provider.totalOmzetFormatted,
                     Icons.attach_money,
                     Colors.green,
                   ),
                   const SizedBox(width: 8),
                   _buildSummaryCard(
-                    'Total Transaksi',
-                    '${provider.totalTransaksi}',
+                    'Total Order',
+                    '${provider.totalOrder}',
                     Icons.receipt_long,
                     Colors.blue,
                   ),
@@ -126,14 +126,14 @@ class _LaporanPageState extends State<LaporanPage> {
                 children: [
                   _buildSummaryCard(
                     'Item Terjual',
-                    '${provider.totalItemTerjual}',
+                    '${provider.totalItem}',
                     Icons.shopping_bag,
                     Colors.orange,
                   ),
                   const SizedBox(width: 8),
                   _buildSummaryCard(
-                    'Rata-rata',
-                    provider.rataRataFormatted,
+                    'Rata-rata/Order',
+                    provider.rataRataPerOrderFormatted,
                     Icons.analytics,
                     Colors.purple,
                   ),
@@ -204,7 +204,7 @@ class _LaporanPageState extends State<LaporanPage> {
         if (provider.isLoading) {
           return const Center(child: CircularProgressIndicator());
         }
-        if (provider.items.isEmpty) {
+        if (provider.menuTerlaris.isEmpty) {
           return const Center(child: Text('Tidak ada data penjualan'));
         }
         return Container(
@@ -216,9 +216,18 @@ class _LaporanPageState extends State<LaporanPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Padding(
-                padding: EdgeInsets.all(AppConstants.paddingMedium),
-                child: Text('Detail Transaksi', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Padding(
+                padding: const EdgeInsets.all(AppConstants.paddingMedium),
+                child: Row(
+                  children: [
+                    const Icon(Icons.emoji_events, color: Colors.amber, size: 24),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Menu Terlaris',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
               ),
               // Table Header
               Container(
@@ -226,20 +235,24 @@ class _LaporanPageState extends State<LaporanPage> {
                 color: Colors.grey[100],
                 child: const Row(
                   children: [
-                    Expanded(flex: 2, child: Text('ID Order', style: TextStyle(fontWeight: FontWeight.bold))),
-                    Expanded(flex: 2, child: Text('Tanggal', style: TextStyle(fontWeight: FontWeight.bold))),
-                    Expanded(flex: 3, child: Text('Menu', style: TextStyle(fontWeight: FontWeight.bold))),
-                    Expanded(flex: 1, child: Text('Qty', style: TextStyle(fontWeight: FontWeight.bold))),
-                    Expanded(flex: 2, child: Text('Total', style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(flex: 1, child: Text('Rank', style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(flex: 4, child: Text('Nama Menu', style: TextStyle(fontWeight: FontWeight.bold))),
+                    Expanded(flex: 2, child: Text('Terjual', style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.right)),
                   ],
                 ),
               ),
               // Table Body
               Expanded(
                 child: ListView.builder(
-                  itemCount: provider.items.length,
+                  itemCount: provider.menuTerlaris.length,
                   itemBuilder: (context, index) {
-                    final item = provider.items[index];
+                    final menu = provider.menuTerlaris[index];
+                    final rank = index + 1;
+                    Color rankColor = Colors.grey;
+                    if (rank == 1) rankColor = Colors.amber;
+                    else if (rank == 2) rankColor = Colors.grey[400]!;
+                    else if (rank == 3) rankColor = Colors.brown[300]!;
+                    
                     return Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       decoration: BoxDecoration(
@@ -247,11 +260,44 @@ class _LaporanPageState extends State<LaporanPage> {
                       ),
                       child: Row(
                         children: [
-                          Expanded(flex: 2, child: Text(item.idOrder)),
-                          Expanded(flex: 2, child: Text(item.tanggalFormatted)),
-                          Expanded(flex: 3, child: Text(item.namaMenu)),
-                          Expanded(flex: 1, child: Text('${item.jumlah}x')),
-                          Expanded(flex: 2, child: Text(item.totalHargaFormatted)),
+                          Expanded(
+                            flex: 1,
+                            child: Container(
+                              width: 32,
+                              height: 32,
+                              decoration: BoxDecoration(
+                                color: rankColor.withValues(alpha: 0.2),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Center(
+                                child: Text(
+                                  '#$rank',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: rankColor,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 4,
+                            child: Text(
+                              menu.namaMenu,
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: Text(
+                              '${menu.totalTerjual}x',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                              textAlign: TextAlign.right,
+                            ),
+                          ),
                         ],
                       ),
                     );

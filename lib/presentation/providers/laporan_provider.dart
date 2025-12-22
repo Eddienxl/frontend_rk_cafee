@@ -5,11 +5,11 @@ import '../../data/models/laporan_model.dart';
 /// Provider untuk state management Laporan Penjualan
 /// Menerapkan prinsip OOP:
 /// - Encapsulation: state internal di-protect
-/// - Aggregation: menggunakan LaporanSummary untuk ringkasan
+/// - Aggregation: menggunakan LaporanPenjualanResponse untuk ringkasan
 class LaporanProvider extends ChangeNotifier {
   final LaporanApiService _laporanService;
 
-  LaporanSummary? _summary;
+  LaporanPenjualanResponse? _laporan;
   bool _isLoading = false;
   String? _errorMessage;
   DateTime? _startDate;
@@ -18,20 +18,21 @@ class LaporanProvider extends ChangeNotifier {
   LaporanProvider(this._laporanService);
 
   // ==================== GETTERS ====================
-  LaporanSummary? get summary => _summary;
-  List<LaporanItem> get items => _summary?.items ?? [];
+  LaporanPenjualanResponse? get laporan => _laporan;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   DateTime? get startDate => _startDate;
   DateTime? get endDate => _endDate;
 
-  // Computed properties dari summary
-  double get totalPendapatan => _summary?.totalPendapatan ?? 0;
-  int get totalTransaksi => _summary?.totalTransaksi ?? 0;
-  int get totalItemTerjual => _summary?.totalItemTerjual ?? 0;
-  String get totalPendapatanFormatted => _summary?.totalPendapatanFormatted ?? 'Rp 0';
-  String get rataRataFormatted => _summary?.rataRataFormatted ?? 'Rp 0';
-  Map<String, int> get menuTerlaris => _summary?.menuTerlaris ?? {};
+  // Computed properties dari laporan
+  int get totalOrder => _laporan?.totalOrder ?? 0;
+  double get totalOmzet => _laporan?.totalOmzet ?? 0;
+  int get totalItem => _laporan?.totalItem ?? 0;
+  List<MenuTerlaris> get menuTerlaris => _laporan?.menuTerlaris ?? [];
+  
+  String get totalOmzetFormatted => _laporan?.totalOmzetFormatted ?? 'Rp 0';
+  String get rataRataPerOrderFormatted => _laporan?.rataRataPerOrderFormatted ?? 'Rp 0';
+  String get periodeFormatted => _laporan?.periodeFormatted ?? '-';
 
   // ==================== METHODS ====================
 
@@ -43,17 +44,12 @@ class LaporanProvider extends ChangeNotifier {
     _endDate = endDate;
 
     try {
-      final items = await _laporanService.getLaporanPenjualan(
+      final laporan = await _laporanService.getLaporanPenjualan(
         startDate: startDate,
         endDate: endDate,
       );
       
-      _summary = LaporanSummary(
-        items: items,
-        startDate: startDate,
-        endDate: endDate,
-      );
-      
+      _laporan = laporan;
       _setLoading(false);
     } catch (e) {
       _setError(e.toString());
@@ -91,7 +87,7 @@ class LaporanProvider extends ChangeNotifier {
 
   /// Clear laporan
   void clearLaporan() {
-    _summary = null;
+    _laporan = null;
     _startDate = null;
     _endDate = null;
     notifyListeners();
@@ -113,4 +109,3 @@ class LaporanProvider extends ChangeNotifier {
     _errorMessage = null;
   }
 }
-
