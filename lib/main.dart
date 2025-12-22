@@ -1,122 +1,169 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 
+import 'core/constants/app_constants.dart';
+import 'core/network/api_client.dart';
+import 'data/datasources/auth_api_service.dart';
+import 'data/datasources/menu_api_service.dart';
+import 'data/datasources/order_api_service.dart';
+import 'data/datasources/bahan_baku_api_service.dart';
+import 'data/datasources/bom_api_service.dart';
+import 'data/datasources/laporan_api_service.dart';
+import 'presentation/providers/auth_provider.dart';
+import 'presentation/providers/menu_provider.dart';
+import 'presentation/providers/cart_provider.dart';
+import 'presentation/providers/order_provider.dart';
+import 'presentation/providers/inventory_provider.dart';
+import 'presentation/providers/bom_provider.dart';
+import 'presentation/providers/laporan_provider.dart';
+import 'presentation/pages/login_page.dart';
+import 'presentation/pages/pos_page.dart';
+
+/// Main entry point aplikasi RK Cafe POS
+/// Menerapkan prinsip OOP:
+/// - Dependency Injection: semua dependencies di-inject melalui Provider
+/// - Inversion of Control: Provider mengontrol lifecycle dependencies
 void main() {
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(const RKCafeApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class RKCafeApp extends StatelessWidget {
+  const RKCafeApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+    // Inisialisasi API Client (singleton-like pattern)
+    final apiClient = ApiClient();
+
+    // Inisialisasi Services
+    final authService = AuthApiService(apiClient);
+    final menuService = MenuApiService(apiClient);
+    final orderService = OrderApiService(apiClient);
+    final bahanService = BahanBakuApiService(apiClient);
+    final bomService = BomApiService(apiClient);
+    final laporanService = LaporanApiService(apiClient);
+
+    return MultiProvider(
+      providers: [
+        // Provider untuk Auth
+        ChangeNotifierProvider(
+          create: (_) => AuthProvider(authService, apiClient),
+        ),
+        // Provider untuk Menu
+        ChangeNotifierProvider(
+          create: (_) => MenuProvider(menuService),
+        ),
+        // Provider untuk Cart (tidak perlu service, state lokal)
+        ChangeNotifierProvider(
+          create: (_) => CartProvider(),
+        ),
+        // Provider untuk Order
+        ChangeNotifierProvider(
+          create: (_) => OrderProvider(orderService),
+        ),
+        // Provider untuk Inventory
+        ChangeNotifierProvider(
+          create: (_) => InventoryProvider(bahanService),
+        ),
+        // Provider untuk BOM (Bill of Materials)
+        ChangeNotifierProvider(
+          create: (_) => BomProvider(bomService),
+        ),
+        // Provider untuk Laporan Penjualan
+        ChangeNotifierProvider(
+          create: (_) => LaporanProvider(laporanService),
+        ),
+      ],
+      child: MaterialApp(
+        title: AppConstants.appName,
+        debugShowCheckedModeBanner: false,
+        theme: _buildTheme(),
+        home: const AuthWrapper(),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+    );
+  }
+
+  /// Build theme aplikasi
+  ThemeData _buildTheme() {
+    return ThemeData(
+      useMaterial3: true,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: AppConstants.primaryColor,
+        brightness: Brightness.light,
+      ),
+      textTheme: GoogleFonts.poppinsTextTheme(),
+      appBarTheme: const AppBarTheme(
+        centerTitle: true,
+        elevation: 0,
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          elevation: 0,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        ),
+      ),
+      cardTheme: CardThemeData(
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+        ),
+      ),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+/// Widget untuk mengecek status autentikasi
+/// Menentukan apakah user ke LoginPage atau PosPage
+class AuthWrapper extends StatefulWidget {
+  const AuthWrapper({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<AuthWrapper> createState() => _AuthWrapperState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _AuthWrapperState extends State<AuthWrapper> {
+  bool _isChecking = true;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  @override
+  void initState() {
+    super.initState();
+    _checkAuth();
+  }
+
+  Future<void> _checkAuth() async {
+    final authProvider = context.read<AuthProvider>();
+    await authProvider.checkAuthStatus();
+    if (mounted) {
+      setState(() => _isChecking = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+    if (_isChecking) {
+      return const Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text('Memuat...'),
+            ],
+          ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      );
+    }
+
+    return Consumer<AuthProvider>(
+      builder: (context, auth, _) {
+        if (auth.isLoggedIn) {
+          return const PosPage();
+        }
+        return const LoginPage();
+      },
     );
   }
 }
