@@ -15,7 +15,7 @@ class ApiConstants {
     // Default ke localhost agar berjalan pada web/desktop/iOS simulator.
     // Jika menjalankan pada Android emulator, override dengan:
     // --dart-define=API_BASE_URL="http://10.0.2.2:3000/api"
-    defaultValue: 'http://localhost:3000/api',
+    defaultValue: 'http://backendrkcafee-production-ec5d.up.railway.app/api',
   );
 
   /// Timeout duration dalam detik
