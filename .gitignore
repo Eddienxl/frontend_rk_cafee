@@ -31,7 +31,11 @@ migrate_working_dir/
 .flutter-plugins-dependencies
 .pub-cache/
 .pub/
-/build/
+# Ignore semua build folder KECUALI build/web (untuk Railway deployment)
+/build/*
+!/build/web/
+# Tapi tetap ignore node_modules di frontend
+node_modules/
 
 # Symbolication related
 app.*.symbols
