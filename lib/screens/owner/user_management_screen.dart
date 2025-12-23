@@ -62,7 +62,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              value: selectedRole,
+              initialValue: selectedRole,
               items: roles.map((r) => DropdownMenuItem(value: r, child: Text(r))).toList(),
               onChanged: (val) => selectedRole = val!,
               decoration: const InputDecoration(labelText: 'Role'),
@@ -93,8 +93,9 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                 );
               }
 
-              if (success) _fetchUsers();
-              else {
+              if (success) {
+                _fetchUsers();
+              } else {
                 if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Gagal simpan')));
                 setState(() => _isLoading = false);
               }
@@ -121,8 +122,9 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
               Navigator.pop(context);
               setState(() => _isLoading = true);
               final success = await _ownerService.deleteUser(user.id);
-              if (success) _fetchUsers();
-              else {
+              if (success) {
+                _fetchUsers();
+              } else {
                 if(mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Gagal hapus')));
                  setState(() => _isLoading = false);
               }
