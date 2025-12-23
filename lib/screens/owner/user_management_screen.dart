@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../services/owner_service.dart';
 import '../../models/user_model.dart';
-
+[ignoring loop detection]
 class UserManagementScreen extends StatefulWidget {
   const UserManagementScreen({super.key});
 
@@ -23,13 +23,17 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
   Future<void> _fetchUsers() async {
     try {
       final users = await _ownerService.getUsers();
-      setState(() {
-        _users = users;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _users = users;
+          _isLoading = false;
+        });
+      }
     } catch (e) {
-      setState(() => _isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
     }
   }
 
@@ -75,14 +79,14 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
               bool success;
               if (user == null) {
                 // Add
-                success = await _adminService.createUser(
+                success = await _ownerService.createUser(
                   usernameController.text, 
                   passwordController.text, 
                   selectedRole
                 );
               } else {
                 // Edit
-                success = await _adminService.updateUser(
+                success = await _ownerService.updateUser(
                   user.id, 
                   passwordController.text.isEmpty ? null : passwordController.text, 
                   selectedRole
@@ -90,7 +94,10 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
               }
 
               if (success) _fetchUsers();
-              else ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Gagal simpan')));
+              else {
+                if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Gagal simpan')));
+                setState(() => _isLoading = false);
+              }
               
             },
             child: const Text('Simpan'),
@@ -113,9 +120,12 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
             onPressed: () async {
               Navigator.pop(context);
               setState(() => _isLoading = true);
-              final success = await _adminService.deleteUser(user.id);
+              final success = await _ownerService.deleteUser(user.id);
               if (success) _fetchUsers();
-              else ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Gagal hapus')));
+              else {
+                if(mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Gagal hapus')));
+                 setState(() => _isLoading = false);
+              }
             },
             child: const Text('Hapus'),
           ),
@@ -135,7 +145,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
               itemBuilder: (context, index) {
                 final user = _users[index];
                 return ListTile(
-                  leading: CircleAvatar(child: Text(user.role[0])),
+                  leading: CircleAvatar(child: Text(user.role.isNotEmpty ? user.role[0] : '?')),
                   title: Text(user.username),
                   subtitle: Text(user.role),
                   trailing: Row(
