@@ -157,7 +157,9 @@ class _AuthWrapperState extends State<AuthWrapper> {
       );
     }
 
-        // BYPASS LOGIC: Direct to POS Page for UI testing
-        return const PosPage();
+        if (auth.isLoggedIn) {
+          return const PosPage();
+        }
+        return const LoginPage();
   }
 }

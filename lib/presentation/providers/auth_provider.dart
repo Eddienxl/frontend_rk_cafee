@@ -19,10 +19,10 @@ class AuthProvider extends ChangeNotifier {
   AuthProvider(this._authService, this._apiClient);
 
   // ==================== GETTERS ====================
-  UserModel? get currentUser => const UserModel(idUser: 'dummy', username: 'Owner Mode', role: UserRole.owner, token: 'dummy'); // MOCKED data
+  UserModel? get currentUser => _currentUser;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
-  bool get isLoggedIn => true; // MOCKED: Always logged in
+  bool get isLoggedIn => _currentUser != null && _currentUser!.token != null;
 
   // ==================== METHODS ====================
 
