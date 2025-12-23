@@ -352,9 +352,9 @@ class _PosPageState extends State<PosPage> {
                     SliverGrid(
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 3,
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10,
-                        childAspectRatio: 0.68, // Optimized for 3 columns
+                        crossAxisSpacing: 8,
+                        mainAxisSpacing: 8,
+                        childAspectRatio: 0.72, // Adjusted for 3 columns with 8 spacing
                       ),
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
