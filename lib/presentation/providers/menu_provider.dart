@@ -29,18 +29,26 @@ class MenuProvider extends ChangeNotifier {
   // ==================== METHODS ====================
 
   /// Fetch semua menu dari API
+  /// Fetch menus (MOCKED for UI Testing)
   Future<void> fetchMenus() async {
     _setLoading(true);
     _clearError();
 
-    try {
-      _menus = await _menuService.getAllMenus();
-      _applyFilter();
-      _setLoading(false);
-    } catch (e) {
-      _setError(e.toString());
-      _setLoading(false);
-    }
+    // DUMMY DATA - LOGIC REMOVED
+    await Future.delayed(const Duration(milliseconds: 500)); // Fake delay
+    _menus = [
+      const MenuModel(idMenu: '1', namaMenu: 'Kopi Susu Gula Aren', harga: 18000, kategori: 'Coffee', imageUrl: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?q=80&w=1000', statusTersedia: true),
+      const MenuModel(idMenu: '2', namaMenu: 'Americano', harga: 15000, kategori: 'Coffee', imageUrl: 'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?q=80&w=1000', statusTersedia: true),
+      const MenuModel(idMenu: '3', namaMenu: 'Cappuccino', harga: 20000, kategori: 'Coffee', imageUrl: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?q=80&w=1000', statusTersedia: true),
+      const MenuModel(idMenu: '4', namaMenu: 'Latte', harga: 22000, kategori: 'Coffee', imageUrl: 'https://images.unsplash.com/photo-1461023058943-716d30d94c8f?q=80&w=1000', statusTersedia: true),
+      const MenuModel(idMenu: '5', namaMenu: 'Es Teh Manis', harga: 5000, kategori: 'Non Coffee', imageUrl: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?q=80&w=1000', statusTersedia: true),
+      const MenuModel(idMenu: '6', namaMenu: 'Matcha Latte', harga: 23000, kategori: 'Non Coffee', imageUrl: 'https://images.unsplash.com/photo-1515825838458-f2a94b20105a?q=80&w=1000', statusTersedia: true),
+      const MenuModel(idMenu: '7', namaMenu: 'Nasi Goreng', harga: 25000, kategori: 'Food', imageUrl: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?q=80&w=1000', statusTersedia: true),
+      const MenuModel(idMenu: '8', namaMenu: 'Kentang Goreng', harga: 15000, kategori: 'Food', imageUrl: 'https://images.unsplash.com/photo-1573080496987-aeb4d9171d55?q=80&w=1000', statusTersedia: true),
+      const MenuModel(idMenu: '9', namaMenu: 'Extra Shot', harga: 5000, kategori: 'Add On', imageUrl: '', statusTersedia: true),
+    ];
+    _applyFilter();
+    _setLoading(false);
   }
 
   /// Filter menu berdasarkan kategori
