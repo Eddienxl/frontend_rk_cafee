@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../services/owner_service.dart';
-import '../../services/data_service.dart';
-import '../../models/menu_model.dart';
+import 'package:frontend_rk_cafee/services/owner_service.dart';
+import 'package:frontend_rk_cafee/services/data_service.dart';
+import 'package:frontend_rk_cafee/models/menu_model.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+[ignoring loop detection]
 
 class MenuManagementScreen extends StatefulWidget {
   const MenuManagementScreen({super.key});
@@ -169,12 +171,11 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                         icon: const Icon(Icons.edit, color: Colors.blue),
                         onPressed: () => _showAddEditDialog(menu: menu),
                       ),
-                      // DELETE BUTTON EKSKLUSIF OWNER
-                      if (_userRole == 'OWNER')
-                        IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () => _deleteMenu(menu),
-                        ),
+                      // DELETE BUTTON (ALWAYS VISIBLE FOR OWNER APP)
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () => _deleteMenu(menu),
+                      ),
                     ],
                   ),
                 );

@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'pos_screen.dart';
 import 'owner/user_management_screen.dart';
 import 'owner/laporan_screen.dart';
 import 'owner/menu_management_screen.dart';
 import 'login_screen.dart';
 import '../services/auth_service.dart';
-
-
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -17,11 +14,11 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  String _pageTitle = 'Dashboard';
-  Widget _currentScreen = const Center(child: CircularProgressIndicator()); // Default loading
+  String _pageTitle = 'Dashboard Owner';
+  Widget _currentScreen = const Center(child: CircularProgressIndicator()); 
   
   String _username = '';
-  String _role = '';
+  // String _role = ''; // Role tidak lagi dipakai untuk logic navigasi, fokus OWNER
 
   @override
   void initState() {
@@ -31,22 +28,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   void _loadUserInfo() async {
     final prefs = await SharedPreferences.getInstance();
-    final role = prefs.getString('role') ?? 'KASIR';
-    final username = prefs.getString('username') ?? 'User';
+    final username = prefs.getString('username') ?? 'Owner';
+    // Access token/role for api calls if needed, but UI is strictly Owner now.
 
-    setState(() {
-      _username = username;
-      _role = role;
-      
-      // OWNER: Masuk ke Menu Navigasi Utama (Grid)
-      if (_role == 'OWNER') {
+    if (mounted) {
+      setState(() {
+        _username = username;
+        // Default selalu layar admin home grid
         _pageTitle = 'Dashboard Owner';
         _currentScreen = _buildAdminHomeGrid(); 
-      } else {
-        _pageTitle = 'Kasir POS';
-        _currentScreen = const PosScreen();
-      }
-    });
+      });
+    }
   }
 
   // WIDGET GRID MENU UTAMA UNTUK OWNER
@@ -54,7 +46,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: GridView.count(
-        crossAxisCount: 2, // 2 Kolom biar besar
+        crossAxisCount: 2, 
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
         childAspectRatio: 1.1,
@@ -62,9 +54,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           _buildNavCard('Kelola User', Icons.people, const UserManagementScreen()),
           _buildNavCard('Laporan Keuangan', Icons.bar_chart, const LaporanScreen()),
           _buildNavCard('Kelola Menu', Icons.restaurant_menu, const MenuManagementScreen()),
-          _buildNavCard('Bahan Baku', Icons.inventory, const Center(child: Text("Fitur Bahan Baku"))),
-          _buildNavCard('Resep (BOM)', Icons.science, const Center(child: Text("Fitur BOM Resep"))),
-          _buildNavCard('Input Stok', Icons.input, const Center(child: Text("Fitur Input Stok"))),
+          _buildNavCard('Bahan Baku', Icons.inventory, const Center(child: Text("Fitur Bahan Baku (Soon)"))),
+          _buildNavCard('Resep (BOM)', Icons.science, const Center(child: Text("Fitur BOM Resep (Soon)"))),
+          _buildNavCard('Input Stok', Icons.input, const Center(child: Text("Fitur Input Stok (Soon)"))),
         ],
       ),
     );
@@ -76,7 +68,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       color: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
-        onTap: () => _changePage(title, screen), // from grid (isFromDrawer: false)
+        onTap: () => _changePage(title, screen), 
         borderRadius: BorderRadius.circular(12),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -86,7 +78,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Text(
               title,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF5D4037)),
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF5D4037)),
             ),
           ],
         ),
@@ -101,7 +93,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _currentScreen = screen;
     });
     if (isFromDrawer) {
-      Navigator.pop(context); // Tutup drawer manuallly
+      Navigator.pop(context); 
     }
   }
 
@@ -138,68 +130,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
             
-            // MENU NAVIGASI DINAMIS
-
-            if (_role == 'OWNER') ...[
-              ListTile(
-                leading: const Icon(Icons.grid_view), // Icon Grid
-                title: const Text('Menu Utama'),
-                onTap: () {
-                   setState(() {
-                      _pageTitle = 'Dashboard Owner';
-                      _currentScreen = _buildAdminHomeGrid();
-                   });
-                   Navigator.pop(context);
-                },
-              ),
-              const Divider(),
-              ListTile(
-                leading: const Icon(Icons.bar_chart),
-                title: const Text('Laporan Keuangan'),
-                onTap: () => _changePage('Laporan Keuangan', const LaporanScreen(), isFromDrawer: true),
-              ),
-              ListTile(
-                leading: const Icon(Icons.people),
-                title: const Text('Manajemen Karyawan'),
-                onTap: () => _changePage('Manajemen User', const UserManagementScreen(), isFromDrawer: true),
-              ),
-              ListTile(
-                leading: const Icon(Icons.restaurant_menu),
-                title: const Text('Kelola Menu'),
-                onTap: () => _changePage('Kelola Menu', const MenuManagementScreen(), isFromDrawer: true),
-              ),
-              // Owner TIDAK melihat POS
-            ],
-
-            // 2. KASIR MENU
-            if (_role == 'KASIR') ...[
-              ListTile(
-                leading: const Icon(Icons.point_of_sale),
-                title: const Text('Kasir (POS)'),
-                onTap: () => _changePage('Kasir POS', const PosScreen(), isFromDrawer: true),
-              ),
-              ListTile(
-                leading: const Icon(Icons.restaurant_menu),
-                title: const Text('Daftar Menu'),
-                onTap: () => _changePage('Daftar Menu', const MenuManagementScreen(), isFromDrawer: true),
-              ),
-            ],
-
-            // 3. BARISTA MENU (Optional)
-             if (_role == 'BARISTA') ...[
-              ListTile(
-                leading: const Icon(Icons.coffee),
-                title: const Text('Kitchen Display'),
-                onTap: () => {}, // Placeholder
-              ),
-            ],
-
-            // MENU COMMS (SEMUA BISA AKSES INVENTORI?)
+            // MENU NAVIGASI (HANYA OWNER)
+            ListTile(
+              leading: const Icon(Icons.grid_view), 
+              title: const Text('Menu Utama'),
+              onTap: () {
+                  setState(() {
+                    _pageTitle = 'Dashboard Owner';
+                    _currentScreen = _buildAdminHomeGrid();
+                  });
+                  Navigator.pop(context);
+              },
+            ),
             const Divider(),
             ListTile(
-              leading: const Icon(Icons.inventory),
-              title: const Text('Inventori Bahan'),
-              onTap: () => {}, // Placeholder
+              leading: const Icon(Icons.bar_chart),
+              title: const Text('Laporan Keuangan'),
+              onTap: () => _changePage('Laporan Keuangan', const LaporanScreen(), isFromDrawer: true),
+            ),
+            ListTile(
+              leading: const Icon(Icons.people),
+              title: const Text('Manajemen Karyawan'),
+              onTap: () => _changePage('Manajemen User', const UserManagementScreen(), isFromDrawer: true),
+            ),
+            ListTile(
+              leading: const Icon(Icons.restaurant_menu),
+              title: const Text('Kelola Menu'),
+              onTap: () => _changePage('Kelola Menu', const MenuManagementScreen(), isFromDrawer: true),
             ),
 
             const Divider(),

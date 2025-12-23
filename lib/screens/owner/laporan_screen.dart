@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../services/owner_service.dart';
+import 'package:frontend_rk_cafee/services/owner_service.dart';
 import 'package:intl/intl.dart';
 
 class LaporanScreen extends StatefulWidget {
