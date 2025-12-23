@@ -83306,9 +83306,9 @@ L(a){var s,r,q,p=this,o=null,n="menu_terlaris",m=A.atA(0,"id_ID","Rp "),l=A.Yc(!
 if(p.f)s=B.e_
 else{s=p.e
 if(s==null)s=B.CV
-else{s=s.h(0,"omzet_total")
+else{s=s.h(0,"total_omzet")
 s=A.c1(m.GO(s==null?0:s),o,o,o,B.U8,o,o)
-r=p.e.h(0,"transaksi_count")
+r=p.e.h(0,"total_order")
 q=t.p
 q=A.c([A.Ze(new A.bq(B.j9,A.i2(A.c([B.V2,B.zc,s,B.fD,A.pr(A.c([B.Vb,A.c1(A.k(r==null?0:r),o,o,o,B.hS,o,o)],q),B.an,B.hc,B.bv)],q),B.an,B.al,B.bv),o),B.iA,o,o,o),B.kY,B.V8,B.zc],q)
 if(p.e.h(0,n)!=null)B.b.T(q,J.ls(t.j.a(p.e.h(0,n)),new A.alc(),t.l7))
@@ -83324,7 +83324,7 @@ $0(){return this.a.f=!1},
 $S:0}
 A.alc.prototype={
 $1(a){var s=null,r=J.bw(a),q=r.h(a,"nama_menu")
-return A.ig(B.Gb,s,s,A.c1(q==null?"Unknown":q,s,s,s,s,s,s),A.c1(A.k(r.h(a,"qty"))+" terjual",s,s,s,s,s,s))},
+return A.ig(B.Gb,s,s,A.c1(q==null?"Unknown":q,s,s,s,s,s,s),A.c1(A.k(r.h(a,"total_terjual"))+" terjual",s,s,s,s,s,s))},
 $S:509}
 A.z8.prototype={
 ak(){return new A.RW(new A.Iv(),new A.qv(),A.c([],t.ma))}}
