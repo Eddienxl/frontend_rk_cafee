@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../services/owner_service.dart';
-import '../../models/user_model.dart';
-[ignoring loop detection]
+import 'package:frontend_rk_cafee/services/owner_service.dart';
+import 'package:frontend_rk_cafee/models/user_model.dart';
 class UserManagementScreen extends StatefulWidget {
   const UserManagementScreen({super.key});
 

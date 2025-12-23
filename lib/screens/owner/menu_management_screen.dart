@@ -5,7 +5,6 @@ import 'package:frontend_rk_cafee/models/menu_model.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-[ignoring loop detection]
 
 class MenuManagementScreen extends StatefulWidget {
   const MenuManagementScreen({super.key});
