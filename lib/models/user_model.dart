@@ -12,37 +12,33 @@ class UserModel {
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
-    // Robust parsing untuk menangani berbagai format response backend
-    Map<String, dynamic>? userData;
-    String? tokenStr = json['token'];
-
-    // 1. Cek jika struktur: { data: { user: {...}, token: "..." } }
-    if (json.containsKey('data') && json['data'] is Map) {
-      final data = json['data'];
-      if (data.containsKey('user')) {
+    // Logic sederhana & defensif: Cari map yang punya key 'username' atau 'role'
+    // Prioritas: json['data']['user'] -> json['data'] -> json['user'] -> json
+    
+    Map<String, dynamic> userData = json;
+    
+    if (json['data'] is Map) {
+      final data = json['data'] as Map<String, dynamic>;
+      if (data['user'] is Map) {
         userData = data['user'];
       } else {
-        userData = data; // user info langsung di dalam data
+        userData = data;
       }
-      if (tokenStr == null && data.containsKey('token')) {
-        tokenStr = data['token'];
-      }
-    } 
-    // 2. Cek jika struktur: { user: {...}, token: "..." }
-    else if (json.containsKey('user')) {
+    } else if (json['user'] is Map) {
       userData = json['user'];
-    } 
-    // 3. Fallback: JSON itu sendiri adalah user data
-    else {
-      userData = json;
+    }
+
+    // Ekstrak token
+    String? token = json['token'];
+    if (token == null && json['data'] is Map) {
+      token = json['data']['token'];
     }
 
     return UserModel(
-      id: userData?['id_user']?.toString() ?? userData?['id']?.toString() ?? '',
-      username: userData?['username'] ?? '',
-      // Pakai UpperCase biar aman perbandingannya nanti
-      role: (userData?['role'] ?? 'KASIR').toString().toUpperCase(), 
-      token: tokenStr,
+      id: userData['id_user']?.toString() ?? userData['id']?.toString() ?? '',
+      username: userData['username']?.toString() ?? '',
+      role: (userData['role']?.toString() ?? 'KASIR').toUpperCase(),
+      token: token,
     );
   }
 }
