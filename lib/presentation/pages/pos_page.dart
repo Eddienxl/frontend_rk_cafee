@@ -66,7 +66,7 @@ class _PosPageState extends State<PosPage> {
         children: [
           Icon(Icons.coffee, size: 28),
           SizedBox(width: 8),
-          Text(AppConstants.appName),
+          Text('${AppConstants.appName} (v3)'),
         ],
       ),
       actions: [
