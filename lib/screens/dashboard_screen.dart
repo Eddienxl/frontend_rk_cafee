@@ -38,7 +38,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       
       // OWNER: Masuk ke Menu Navigasi Utama (Grid)
       if (_role == 'OWNER') {
-        _pageTitle = 'Menu Admin';
+        _pageTitle = 'Dashboard Owner';
         _currentScreen = _buildAdminHomeGrid(); 
       } else {
         _pageTitle = 'Kasir POS';
@@ -144,7 +144,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 title: const Text('Menu Utama'),
                 onTap: () {
                    setState(() {
-                      _pageTitle = 'Menu Admin';
+                      _pageTitle = 'Dashboard Owner';
                       _currentScreen = _buildAdminHomeGrid();
                    });
                    Navigator.pop(context);
