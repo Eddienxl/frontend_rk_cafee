@@ -83,52 +83,31 @@ class _PosScreenState extends State<PosScreen> {
     );
   }
 
-  Future<void> _logout() async {
-    await _authService.logout();
-    if (mounted) {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
-        (route) => false,
-      );
-    }
-  }
+
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('RK Cafe POS (v3.1)'),
-        backgroundColor: const Color(0xFF5D4037),
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: _logout,
-          )
-        ],
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _errorMessage.isNotEmpty
-              ? Center(child: Text('Error: $_errorMessage'))
-              : Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3, // FIX: 3 Kolom
-                      childAspectRatio: 0.72,
-                      crossAxisSpacing: 8,
-                      mainAxisSpacing: 8,
-                    ),
-                    itemCount: _menus.length,
-                    itemBuilder: (context, index) {
-                      final menu = _menus[index];
-                      return _buildMenuCard(menu);
-                    },
+    // Scaffold & AppBar Removed to avoid nested scaffold issues in DashboardScreen
+    return _isLoading
+        ? const Center(child: CircularProgressIndicator())
+        : _errorMessage.isNotEmpty
+            ? Center(child: Text('Error: $_errorMessage'))
+            : Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3, 
+                    childAspectRatio: 0.72,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
                   ),
+                  itemCount: _menus.length,
+                  itemBuilder: (context, index) {
+                    final menu = _menus[index];
+                    return _buildMenuCard(menu);
+                  },
                 ),
-    );
+              );
   }
 
   Widget _buildMenuCard(MenuModel menu) {
