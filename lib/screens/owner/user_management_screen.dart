@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../services/admin_service.dart';
+import '../../services/owner_service.dart';
 import '../../models/user_model.dart';
 
 class UserManagementScreen extends StatefulWidget {
@@ -10,7 +10,7 @@ class UserManagementScreen extends StatefulWidget {
 }
 
 class _UserManagementScreenState extends State<UserManagementScreen> {
-  final AdminService _adminService = AdminService();
+  final OwnerService _ownerService = OwnerService();
   List<UserModel> _users = [];
   bool _isLoading = true;
 
@@ -22,7 +22,29 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
 
   Future<void> _fetchUsers() async {
     try {
-      final users = await _adminService.getUsers();
+    try {
+      final users = await _ownerService.getUsers();
+      setState(() {
+
+// ... 
+
+                success = await _ownerService.createUser(
+                  usernameController.text, 
+                  passwordController.text, 
+                  selectedRole
+                );
+              } else {
+                // Edit
+                success = await _ownerService.updateUser(
+                  user.id, 
+                  passwordController.text.isEmpty ? null : passwordController.text, 
+                  selectedRole
+                );
+              }
+
+// ...
+
+              final success = await _ownerService.deleteUser(user.id);
       setState(() {
         _users = users;
         _isLoading = false;

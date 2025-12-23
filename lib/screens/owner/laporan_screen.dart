@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../services/admin_service.dart';
+import '../../services/owner_service.dart';
 import 'package:intl/intl.dart';
 
 class LaporanScreen extends StatefulWidget {
@@ -10,7 +10,7 @@ class LaporanScreen extends StatefulWidget {
 }
 
 class _LaporanScreenState extends State<LaporanScreen> {
-  final AdminService _adminService = AdminService();
+  final OwnerService _ownerService = OwnerService();
   Map<String, dynamic>? _laporanData;
   bool _isLoading = true;
 
@@ -22,7 +22,7 @@ class _LaporanScreenState extends State<LaporanScreen> {
 
   Future<void> _fetchLaporan() async {
     try {
-      final data = await _adminService.getLaporanPenjualan();
+      final data = await _ownerService.getLaporanPenjualan();
       setState(() {
         _laporanData = data;
         _isLoading = false;

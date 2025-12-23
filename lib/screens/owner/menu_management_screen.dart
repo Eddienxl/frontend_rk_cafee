@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../services/admin_service.dart';
+import '../../services/owner_service.dart';
 import '../../services/data_service.dart';
 import '../../models/menu_model.dart';
 import 'package:intl/intl.dart';
@@ -14,7 +14,7 @@ class MenuManagementScreen extends StatefulWidget {
 
 class _MenuManagementScreenState extends State<MenuManagementScreen> {
   final DataService _dataService = DataService();
-  final AdminService _adminService = AdminService();
+  final OwnerService _ownerService = OwnerService();
   
   List<MenuModel> _menus = [];
   bool _isLoading = true;
@@ -88,20 +88,24 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
               bool success;
               if (menu == null) {
                 // Add
-                success = await _adminService.createMenu(
+                success = await _ownerService.createMenu(
                   namaController.text,
                   int.tryParse(hargaController.text) ?? 0,
                   selectedKategori
                 );
               } else {
                 // Edit
-                success = await _adminService.updateMenu(
+                success = await _ownerService.updateMenu(
                   menu.id,
                   namaController.text,
                   int.tryParse(hargaController.text) ?? 0,
                   selectedKategori
                 );
               }
+
+// ... Skipping context in patch ...
+
+              final success = await _ownerService.deleteMenu(menu.id);
 
               if (success) _fetchData();
               else {
