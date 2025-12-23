@@ -351,10 +351,10 @@ class _PosPageState extends State<PosPage> {
                     // Grid menu untuk kategori ini
                     SliverGrid(
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
+                        crossAxisCount: 3,
                         crossAxisSpacing: 8,
                         mainAxisSpacing: 8,
-                        childAspectRatio: 0.9,
+                        childAspectRatio: 0.75, // Ajusted aspect ratio for 3 columns to prevent overflow
                       ),
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {

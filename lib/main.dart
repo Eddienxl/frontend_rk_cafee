@@ -159,10 +159,12 @@ class _AuthWrapperState extends State<AuthWrapper> {
 
     return Consumer<AuthProvider>(
       builder: (context, auth, _) {
-        if (auth.isLoggedIn) {
-          return const PosPage();
-        }
-        return const LoginPage();
+        // [MODIFIED] Bypass Login Check
+        // if (auth.isLoggedIn) {
+        //   return const PosPage();
+        // }
+        // return const LoginPage();
+        return const PosPage();
       },
     );
   }

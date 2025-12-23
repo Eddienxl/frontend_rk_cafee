@@ -39,8 +39,8 @@ class MenuCard extends StatelessWidget {
           color: _getBackgroundColor(),
           borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
           border: Border.all(
-            color: isSelected ? AppConstants.primaryColor : Colors.transparent,
-            width: 2,
+            color: AppConstants.primaryColor,
+            width: isSelected ? 3 : 1,
           ),
           boxShadow: [
             BoxShadow(
