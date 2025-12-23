@@ -34,6 +34,10 @@ class AdminService {
     final token = await _getToken();
     final url = Uri.parse('${ApiConfig.baseUrl}/users');
 
+    // Generate ID User (Backend requires ID)
+    // Format: USR + last 6 digits of timestamp
+    final idUser = 'USR-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
+
     final response = await http.post(
       url,
       headers: {
@@ -41,6 +45,7 @@ class AdminService {
         'Authorization': 'Bearer $token'
       },
       body: jsonEncode({
+        'id_user': idUser,
         'username': username,
         'password': password,
         'role': role,
@@ -84,9 +89,18 @@ class AdminService {
 
   // ================= LAPORAN KEUANGAN =================
 
-  Future<Map<String, dynamic>> getLaporanPenjualan({String? period}) async {
+  Future<Map<String, dynamic>> getLaporanPenjualan({String? startDate, String? endDate}) async {
     final token = await _getToken();
-    final url = Uri.parse('${ApiConfig.baseUrl}/laporan/penjualan'); 
+    
+    // Default URL
+    String urlString = '${ApiConfig.baseUrl}/laporan/penjualan';
+    
+    // Add Query Params
+    if (startDate != null && endDate != null) {
+      urlString += '?startDate=$startDate&endDate=$endDate';
+    }
+
+    final url = Uri.parse(urlString); 
 
     final response = await http.get(
       url,
@@ -96,7 +110,7 @@ class AdminService {
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
-      throw Exception("Gagal ambil laporan");
+      throw Exception("Gagal ambil laporan: ${response.body}");
     }
   }
   

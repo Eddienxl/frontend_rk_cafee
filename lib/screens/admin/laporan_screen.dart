@@ -70,7 +70,7 @@ class _LaporanScreenState extends State<LaporanScreen> {
                               const Text("Total Omzet", style: TextStyle(fontSize: 16)),
                               const SizedBox(height: 8),
                               Text(
-                                currencyFormat.format(_laporanData!['omzet_total'] ?? 0),
+                                currencyFormat.format(_laporanData!['total_omzet'] ?? 0),
                                 style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blue),
                               ),
                               const Divider(),
@@ -78,7 +78,7 @@ class _LaporanScreenState extends State<LaporanScreen> {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   const Text("Total Transaksi"),
-                                  Text("${_laporanData!['transaksi_count'] ?? 0}", style: const TextStyle(fontWeight: FontWeight.bold)),
+                                  Text("${_laporanData!['total_order'] ?? 0}", style: const TextStyle(fontWeight: FontWeight.bold)),
                                 ],
                               )
                             ],
@@ -88,13 +88,12 @@ class _LaporanScreenState extends State<LaporanScreen> {
                       const SizedBox(height: 24),
                       const Text("Menu Terlaris", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 8),
-                      // List Menu Terlaris (Asumsi data ada di menu_terlaris)
                       if (_laporanData!['menu_terlaris'] != null)
                         ...(_laporanData!['menu_terlaris'] as List).map((item) {
                           return ListTile(
                             leading: const Icon(Icons.star, color: Colors.orange),
                             title: Text(item['nama_menu'] ?? 'Unknown'),
-                            trailing: Text("${item['qty']} terjual"),
+                            trailing: Text("${item['total_terjual']} terjual"),
                           );
                         })
                       else
