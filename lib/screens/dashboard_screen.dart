@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'pos_screen.dart';
 import 'admin/user_management_screen.dart';
 import 'admin/laporan_screen.dart';
+import 'admin/menu_management_screen.dart';
 import 'login_screen.dart';
 import '../services/auth_service.dart';
 
@@ -14,8 +15,8 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  String _pageTitle = 'POS Kasir';
-  Widget _currentScreen = const PosScreen();
+  String _pageTitle = 'Dashboard';
+  Widget _currentScreen = const Center(child: CircularProgressIndicator()); // Default loading
   
   String _username = '';
   String _role = '';
@@ -28,9 +29,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   void _loadUserInfo() async {
     final prefs = await SharedPreferences.getInstance();
+    final role = prefs.getString('role') ?? 'KASIR';
+    final username = prefs.getString('username') ?? 'User';
+
     setState(() {
-      _username = prefs.getString('username') ?? 'User';
-      _role = prefs.getString('role') ?? 'KASIR';
+      _username = username;
+      _role = role;
+      
+      // LOGIC DEFAULT SCREEN BERDASARKAN ROLE
+      if (_role == 'OWNER') {
+        _pageTitle = 'Dashboard Owner';
+        _currentScreen = const LaporanScreen(); // Home Owner = Laporan
+      } else {
+        _pageTitle = 'Kasir POS';
+        _currentScreen = const PosScreen(); // Home Kasir = POS
+      }
     });
   }
 
@@ -75,19 +88,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
             
-            // MENU UMUM (SEMUA ROLE)
-            ListTile(
-              leading: const Icon(Icons.point_of_sale),
-              title: const Text('Kasir (POS)'),
-              onTap: () => _changePage('POS Kasir', const PosScreen()),
-            ),
+            // MENU NAVIGASI DINAMIS
 
-            // MENU KHUSUS OWNER
+            // 1. OWNER MENU
             if (_role == 'OWNER') ...[
-              const Divider(),
-              const Padding(
-                padding: EdgeInsets.only(left: 16, top: 8, bottom: 8),
-                child: Text('ADMINISTRASI', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+              ListTile(
+                leading: const Icon(Icons.dashboard),
+                title: const Text('Dashboard (Laporan)'),
+                onTap: () => _changePage('Dashboard Owner', const LaporanScreen()),
               ),
               ListTile(
                 leading: const Icon(Icons.people),
@@ -95,11 +103,43 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 onTap: () => _changePage('Manajemen User', const UserManagementScreen()),
               ),
               ListTile(
-                leading: const Icon(Icons.bar_chart),
-                title: const Text('Laporan Keuangan'),
-                onTap: () => _changePage('Laporan Keuangan', const LaporanScreen()),
+                leading: const Icon(Icons.restaurant_menu),
+                title: const Text('Kelola Menu'),
+                onTap: () => _changePage('Kelola Menu', const MenuManagementScreen()),
+              ),
+              // Owner TIDAK melihat POS
+            ],
+
+            // 2. KASIR MENU
+            if (_role == 'KASIR') ...[
+              ListTile(
+                leading: const Icon(Icons.point_of_sale),
+                title: const Text('Kasir (POS)'),
+                onTap: () => _changePage('Kasir POS', const PosScreen()),
+              ),
+              ListTile(
+                leading: const Icon(Icons.restaurant_menu),
+                title: const Text('Daftar Menu'),
+                onTap: () => _changePage('Daftar Menu', const MenuManagementScreen()),
               ),
             ],
+
+            // 3. BARISTA MENU (Optional)
+             if (_role == 'BARISTA') ...[
+              ListTile(
+                leading: const Icon(Icons.coffee),
+                title: const Text('Kitchen Display'),
+                onTap: () => {}, // Placeholder
+              ),
+            ],
+
+            // MENU COMMS (SEMUA BISA AKSES INVENTORI?)
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.inventory),
+              title: const Text('Inventori Bahan'),
+              onTap: () => {}, // Placeholder
+            ),
 
             const Divider(),
             ListTile(

@@ -3,7 +3,6 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/api_config.dart';
 import '../models/user_model.dart';
-import '../models/menu_model.dart'; // Untuk Top Selling items jika ada
 
 class AdminService {
   Future<String?> _getToken() async {
@@ -13,7 +12,6 @@ class AdminService {
 
   // ================= USER MANAGEMENT =================
 
-  // GET ALL USERS
   Future<List<UserModel>> getUsers() async {
     final token = await _getToken();
     final url = Uri.parse('${ApiConfig.baseUrl}/users');
@@ -32,7 +30,6 @@ class AdminService {
     }
   }
 
-  // CREATE USER
   Future<bool> createUser(String username, String password, String role) async {
     final token = await _getToken();
     final url = Uri.parse('${ApiConfig.baseUrl}/users');
@@ -53,7 +50,6 @@ class AdminService {
     return response.statusCode == 201 || response.statusCode == 200;
   }
 
-  // UPDATE USER
   Future<bool> updateUser(String id, String? password, String? role) async {
     final token = await _getToken();
     final url = Uri.parse('${ApiConfig.baseUrl}/users/$id');
@@ -74,7 +70,6 @@ class AdminService {
     return response.statusCode == 200;
   }
 
-  // DELETE USER
   Future<bool> deleteUser(String id) async {
     final token = await _getToken();
     final url = Uri.parse('${ApiConfig.baseUrl}/users/$id');
@@ -89,12 +84,9 @@ class AdminService {
 
   // ================= LAPORAN KEUANGAN =================
 
-  // GET LAPORAN PENJUALAN
-  // Return Map karena struktur laporan biasanya kompleks (total omzet, list transaksi, dll)
   Future<Map<String, dynamic>> getLaporanPenjualan({String? period}) async {
     final token = await _getToken();
     final url = Uri.parse('${ApiConfig.baseUrl}/laporan/penjualan'); 
-    // TODO: Add query params ?start_date=... if needed
 
     final response = await http.get(
       url,
@@ -108,9 +100,52 @@ class AdminService {
     }
   }
   
-  // ================= MENU MANAGEMENT (OWNER ONLY) =================
+  // ================= MENU MANAGEMENT =================
   
-  // DELETE MENU (Restricted to Owner usually)
+  // CREATE MENU
+  Future<bool> createMenu(String nama, int harga, String kategori) async {
+    final token = await _getToken();
+    final url = Uri.parse('${ApiConfig.baseUrl}/menus');
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      },
+      body: jsonEncode({
+        'nama_menu': nama,
+        'harga': harga,
+        'kategori': kategori,
+        'status_tersedia': true
+      }),
+    );
+
+    return response.statusCode == 201 || response.statusCode == 200;
+  }
+
+  // UPDATE MENU
+  Future<bool> updateMenu(String id, String nama, int harga, String kategori) async {
+    final token = await _getToken();
+    final url = Uri.parse('${ApiConfig.baseUrl}/menus/$id');
+
+    final response = await http.put(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      },
+      body: jsonEncode({
+        'nama_menu': nama,
+        'harga': harga,
+        'kategori': kategori,
+      }),
+    );
+
+    return response.statusCode == 200;
+  }
+
+  // DELETE MENU (Restricted to Owner)
   Future<bool> deleteMenu(String idMenu) async {
     final token = await _getToken();
     final url = Uri.parse('${ApiConfig.baseUrl}/menus/$idMenu');
