@@ -29,8 +29,11 @@ class AuthApiService implements IAuthApiService {
       },
     );
 
-    if (response['success'] == true && response['data'] != null) {
-      return UserModel.fromJson(response['data']);
+    // API Docs structure: { message, token, user: {...} }
+    if (response['token'] != null && response['user'] != null) {
+      final userJson = response['user'];
+      userJson['token'] = response['token']; // Add token to user json for model
+      return UserModel.fromJson(userJson);
     }
     throw Exception(response['message'] ?? 'Login gagal');
   }

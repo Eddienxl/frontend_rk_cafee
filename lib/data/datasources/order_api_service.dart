@@ -24,8 +24,21 @@ class OrderApiService implements IOrderApiService {
       body: orderData,
     );
 
-    if (response['order'] != null) {
-      return OrderModel.fromJson(response['order']);
+    // API Docs structure: { success: true, message: "...", data: { id_order, total_bayar } }
+    if (response['success'] == true && response['data'] != null) {
+      final data = response['data'];
+      // Because API only returns id and total, we create a partial model or generic one.
+      // Assuming OrderModel has a fromJson that can handle this or we create a specific one.
+      // For now, let's assume we return a model with just these fields.
+      return OrderModel(
+        idOrder: data['id_order'] ?? '',
+        idUser: orderData['id_user'] ?? '',
+        totalBayar: (data['total_bayar'] ?? 0).toDouble(),
+        // other fields empty or default
+        items: [],
+        tanggal: DateTime.now(),
+        statusPesanan: 'BARU',
+      );
     }
     throw Exception(response['message'] ?? 'Gagal membuat order');
   }

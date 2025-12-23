@@ -23,7 +23,8 @@ class MenuApiService implements IMenuApiService {
   Future<List<MenuModel>> getAllMenus() async {
     final response = await _apiClient.get(ApiConstants.menus);
 
-    if (response['success'] == true && response['data'] != null) {
+    // API Docs structure: { message: "...", data: [...] }
+    if (response['data'] != null) {
       final List<dynamic> data = response['data'];
       return data.map((json) => MenuModel.fromJson(json)).toList();
     }
