@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../services/data_service.dart';
+import '../services/admin_service.dart';
 import '../models/menu_model.dart';
 import 'login_screen.dart';
 import '../services/auth_service.dart';
@@ -15,14 +17,28 @@ class PosScreen extends StatefulWidget {
 class _PosScreenState extends State<PosScreen> {
   final DataService _dataService = DataService();
   final AuthService _authService = AuthService();
+  // Service Admin untuk delete menu
+  // TODO: Better injection, but for now direct import in next step if generic service not enough
+  // We'll use DataService if we move delete there, or import AdminService. 
+  // Let's import AdminService in file header first.
+  
   List<MenuModel> _menus = [];
   bool _isLoading = true;
   String _errorMessage = '';
+  String _userRole = ''; // Check role
 
   @override
   void initState() {
     super.initState();
     _fetchMenus();
+    _checkRole();
+  }
+
+  void _checkRole() async {
+    final prefs = await SharedPreferences.getInstance(); // Quick dirty way or use AuthService
+    setState(() {
+      _userRole = prefs.getString('role') ?? '';
+    });
   }
 
   Future<void> _fetchMenus() async {
@@ -38,6 +54,33 @@ class _PosScreenState extends State<PosScreen> {
         _isLoading = false;
       });
     }
+  }
+
+  void _confirmDeleteMenu(MenuModel menu) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Hapus Menu'),
+        content: Text('Hapus ${menu.nama} permanen?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Batal')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () async {
+              Navigator.pop(context);
+              setState(() => _isLoading = true);
+              final success = await AdminService().deleteMenu(menu.id);
+              if (success) _fetchMenus();
+              else {
+                setState(() => _isLoading = false);
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Gagal hapus menu')));
+              }
+            },
+            child: const Text('Hapus'),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _logout() async {
@@ -134,6 +177,11 @@ class _PosScreenState extends State<PosScreen> {
                     currencyFormat.format(menu.harga),
                     style: const TextStyle(color: Color(0xFF5D4037), fontWeight: FontWeight.w600),
                   ),
+                  if (_userRole == 'OWNER') 
+                    IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red, size: 20),
+                      onPressed: () => _confirmDeleteMenu(menu),
+                    ),
                 ],
               ),
             ),
