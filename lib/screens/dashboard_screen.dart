@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'pos_screen.dart';
-import 'admin/user_management_screen.dart';
-import 'admin/laporan_screen.dart';
-import 'admin/menu_management_screen.dart';
+import 'owner/user_management_screen.dart';
+import 'owner/laporan_screen.dart';
+import 'owner/menu_management_screen.dart';
 import 'login_screen.dart';
 import '../services/auth_service.dart';
+
+
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -129,7 +131,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             UserAccountsDrawerHeader(
               decoration: const BoxDecoration(color: Color(0xFF5D4037)),
               accountName: Text(_username, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-              accountEmail: Text("Role: $_role"),
+              accountEmail: null, 
               currentAccountPicture: const CircleAvatar(
                 backgroundColor: Colors.white,
                 child: Icon(Icons.person, size: 40, color: Color(0xFF5D4037)),
