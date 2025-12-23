@@ -103,10 +103,6 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                 );
               }
 
-// ... Skipping context in patch ...
-
-              final success = await _ownerService.deleteMenu(menu.id);
-
               if (success) _fetchData();
               else {
                  setState(() => _isLoading = false);
@@ -133,7 +129,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
             onPressed: () async {
               Navigator.pop(context);
               setState(() => _isLoading = true);
-              final success = await _adminService.deleteMenu(menu.id);
+              final success = await _ownerService.deleteMenu(menu.id);
               if (success) _fetchData();
               else {
                  setState(() => _isLoading = false);

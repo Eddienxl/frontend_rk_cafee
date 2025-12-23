@@ -22,29 +22,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
 
   Future<void> _fetchUsers() async {
     try {
-    try {
       final users = await _ownerService.getUsers();
-      setState(() {
-
-// ... 
-
-                success = await _ownerService.createUser(
-                  usernameController.text, 
-                  passwordController.text, 
-                  selectedRole
-                );
-              } else {
-                // Edit
-                success = await _ownerService.updateUser(
-                  user.id, 
-                  passwordController.text.isEmpty ? null : passwordController.text, 
-                  selectedRole
-                );
-              }
-
-// ...
-
-              final success = await _ownerService.deleteUser(user.id);
       setState(() {
         _users = users;
         _isLoading = false;
