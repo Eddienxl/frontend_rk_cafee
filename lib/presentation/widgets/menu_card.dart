@@ -40,7 +40,7 @@ class MenuCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
           border: Border.all(
             color: AppConstants.primaryColor,
-            width: isSelected ? 3 : 1,
+            width: isSelected ? 3 : 2,
           ),
           boxShadow: [
             BoxShadow(
