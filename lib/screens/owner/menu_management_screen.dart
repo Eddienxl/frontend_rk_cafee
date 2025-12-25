@@ -148,10 +148,10 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
               padding: const EdgeInsets.all(16.0),
               child: GridView.builder(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, // 2 Kolom
-                  childAspectRatio: 0.75, // Aspect ratio card
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
+                  crossAxisCount: 3, // 3 Kolom
+                  childAspectRatio: 0.65, // Card lebih tinggi (sempit tapi muat konten)
+                  crossAxisSpacing: 12, // Spacing sedikit rapat
+                  mainAxisSpacing: 12,
                 ),
                 itemCount: _menus.length,
                 itemBuilder: (context, index) {
@@ -192,7 +192,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
               child: Center(
                 child: Icon(
                   menu.kategori == 'MINUMAN' ? Icons.local_cafe : Icons.restaurant,
-                  size: 48,
+                  size: 32, // Smaller icon
                   color: Colors.grey[400],
                 ),
               ),
@@ -200,22 +200,22 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
           ),
           // INFO
           Expanded(
-            flex: 2,
+            flex: 3, // Give more space for text
             child: Padding(
-              padding: const EdgeInsets.all(12.0),
+              padding: const EdgeInsets.all(8.0), // Smaller padding
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     menu.nama,
-                    maxLines: 1,
+                    maxLines: 2, // Allow 2 lines
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13), // Smaller font
                   ),
                   const SizedBox(height: 4),
                   Text(
                     currencyFormatter.format(menu.harga),
-                    style: const TextStyle(color: Color(0xFF5D4037), fontWeight: FontWeight.bold),
+                    style: const TextStyle(color: Color(0xFF5D4037), fontWeight: FontWeight.bold, fontSize: 12),
                   ),
                   const Spacer(),
                   Row(
@@ -224,18 +224,18 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                       InkWell(
                         onTap: () => _showAddEditDialog(menu: menu),
                         child: Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(color: Colors.orange[50], borderRadius: BorderRadius.circular(8)),
-                          child: const Icon(Icons.edit, size: 20, color: Colors.orange),
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(color: Colors.orange[50], borderRadius: BorderRadius.circular(6)),
+                          child: const Icon(Icons.edit, size: 16, color: Colors.orange),
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 4),
                       InkWell(
                         onTap: () => _deleteMenu(menu),
                          child: Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(color: Colors.red[50], borderRadius: BorderRadius.circular(8)),
-                          child: const Icon(Icons.delete, size: 20, color: Colors.red),
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(color: Colors.red[50], borderRadius: BorderRadius.circular(6)),
+                          child: const Icon(Icons.delete, size: 16, color: Colors.red),
                         ),
                       ),
                     ],
