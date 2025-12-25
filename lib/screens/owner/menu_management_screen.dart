@@ -172,81 +172,104 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
   }
 
   Widget _buildMenuCard(MenuModel menu) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
+    // Logic Inisial (Max 2 huruf)
+    // "Kopi Susu Gula Aren" -> "KS"
+    // "Americano" -> "A"
+    List<String> words = menu.nama.split(' ');
+    String initials = '';
+    if (words.isNotEmpty) {
+      initials += words[0][0].toUpperCase();
+      if (words.length > 1) {
+        initials += words[1][0].toUpperCase();
+      }
+    }
+
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: InkWell(
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 8, offset: const Offset(0, 4))
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // IMAGE PLACEHOLDER
-          Expanded(
-            flex: 3,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-              ),
-              child: Center(
-                child: Icon(
-                  menu.kategori == 'MINUMAN' ? Icons.local_cafe : Icons.restaurant,
-                  size: 32, // Smaller icon
-                  color: Colors.grey[400],
+        onTap: () => _showActionDialog(menu), // Klik kartu untuk opsi
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // IMAGE PLACEHOLDER (INITIALS)
+            Expanded(
+              flex: 3,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.brown[50], // Warna background soft
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                ),
+                child: Center(
+                  child: Text(
+                    initials,
+                    style: const TextStyle(
+                      fontSize: 32, 
+                      fontWeight: FontWeight.bold, 
+                      color: Color(0xFF5D4037)
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-          // INFO
-          Expanded(
-            flex: 3, // Give more space for text
-            child: Padding(
-              padding: const EdgeInsets.all(8.0), // Smaller padding
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    menu.nama,
-                    maxLines: 2, // Allow 2 lines
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13), // Smaller font
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    currencyFormatter.format(menu.harga),
-                    style: const TextStyle(color: Color(0xFF5D4037), fontWeight: FontWeight.bold, fontSize: 12),
-                  ),
-                  const Spacer(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      InkWell(
-                        onTap: () => _showAddEditDialog(menu: menu),
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(color: Colors.orange[50], borderRadius: BorderRadius.circular(6)),
-                          child: const Icon(Icons.edit, size: 16, color: Colors.orange),
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      InkWell(
-                        onTap: () => _deleteMenu(menu),
-                         child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(color: Colors.red[50], borderRadius: BorderRadius.circular(6)),
-                          child: const Icon(Icons.delete, size: 16, color: Colors.red),
-                        ),
-                      ),
-                    ],
-                  )
-                ],
+            // INFO
+            Expanded(
+              flex: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      menu.nama,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      currencyFormatter.format(menu.harga),
+                      style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 12),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Dialog Pilihan Aksi
+  void _showActionDialog(MenuModel menu) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.edit, color: Colors.orange),
+              title: const Text('Edit Menu'),
+              onTap: () {
+                Navigator.pop(context);
+                _showAddEditDialog(menu: menu);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete, color: Colors.red),
+              title: const Text('Hapus Menu'),
+              onTap: () {
+                Navigator.pop(context);
+                _deleteMenu(menu);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
