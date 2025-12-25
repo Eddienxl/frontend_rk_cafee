@@ -135,7 +135,7 @@ class _LaporanScreenState extends State<LaporanScreen> {
                   // MENU TERLARIS
                   const Align(alignment: Alignment.centerLeft, child: Text("Menu Terlaris", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18))),
                   const SizedBox(height: 12),
-                  ...(_laporanData!['menu_terlaris'] as List).map((m) => _buildTopMenuItem(m)).toList(),
+                  ...(_laporanData!['menu_terlaris'] as List).map((m) => _buildTopMenuItem(m)),
 
                   const SizedBox(height: 24),
                   

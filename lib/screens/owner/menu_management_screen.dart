@@ -62,7 +62,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
-              value: selectedKategori,
+              initialValue: selectedKategori,
               items: kategoris.map((k) => DropdownMenuItem(value: k, child: Text(k))).toList(),
               onChanged: (val) => selectedKategori = val!,
               decoration: const InputDecoration(labelText: 'Kategori'),
@@ -88,8 +88,9 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                 success = await _ownerService.updateMenu(menu.id, namaController.text, harga, selectedKategori);
               }
 
-              if (success) _fetchMenus();
-              else {
+              if (success) {
+                _fetchMenus();
+              } else {
                  setState(() => _isLoading = false);
                  if(mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Gagal simpan')));
               }
@@ -115,8 +116,9 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
               Navigator.pop(context);
               setState(() => _isLoading = true);
               final success = await _ownerService.deleteMenu(menu.id);
-               if (success) _fetchMenus();
-              else {
+               if (success) {
+                 _fetchMenus();
+               } else {
                  setState(() => _isLoading = false);
                  if(mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Gagal hapus')));
               }
