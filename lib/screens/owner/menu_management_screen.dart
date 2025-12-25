@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_rk_cafee/services/owner_service.dart';
-import 'package:frontend_rk_cafee/services/data_service.dart';
 import 'package:frontend_rk_cafee/models/menu_model.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 
 class MenuManagementScreen extends StatefulWidget {
   const MenuManagementScreen({super.key});
@@ -14,43 +11,37 @@ class MenuManagementScreen extends StatefulWidget {
 }
 
 class _MenuManagementScreenState extends State<MenuManagementScreen> {
-  final DataService _dataService = DataService();
   final OwnerService _ownerService = OwnerService();
-  
   List<MenuModel> _menus = [];
   bool _isLoading = true;
-  String _userRole = '';
+  final currencyFormatter = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
 
   @override
   void initState() {
     super.initState();
-    _fetchData();
+    _fetchMenus();
   }
-  
-  Future<void> _fetchData() async {
-    final prefs = await SharedPreferences.getInstance();
-    final role = prefs.getString('role') ?? '';
-    
+
+  Future<void> _fetchMenus() async {
+    // Panggil service (yang sudah didummikan)
     try {
-      final menus = await _dataService.getMenus();
-      setState(() {
-        _menus = menus;
-        _userRole = role;
-        _isLoading = false;
-      });
+      final menus = await _ownerService.getMenus();
+      if (mounted) {
+        setState(() {
+          _menus = menus;
+          _isLoading = false;
+        });
+      }
     } catch (e) {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   void _showAddEditDialog({MenuModel? menu}) {
     final namaController = TextEditingController(text: menu?.nama ?? '');
     final hargaController = TextEditingController(text: menu?.harga.toString() ?? '');
-    String selectedKategori = menu?.kategori ?? 'MAKANAN'; // Default
-    // Pastikan kategori valid
-    if (!['MAKANAN', 'MINUMAN', 'SNACK'].contains(selectedKategori)) {
-       selectedKategori = 'MAKANAN'; 
-    }
+    String selectedKategori = menu?.kategori ?? 'MAKANAN';
+    final kategoris = ['MAKANAN', 'MINUMAN', 'SNACK'];
 
     showDialog(
       context: context,
@@ -61,19 +52,18 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
           children: [
             TextField(
               controller: namaController,
-              decoration: const InputDecoration(labelText: 'Nama Menu'),
+              decoration: const InputDecoration(labelText: 'Nama Menu', prefixIcon: Icon(Icons.fastfood)),
             ),
+            const SizedBox(height: 12),
             TextField(
               controller: hargaController,
-              decoration: const InputDecoration(labelText: 'Harga (Rp)'),
               keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: 'Harga', prefixIcon: Icon(Icons.attach_money)),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             DropdownButtonFormField<String>(
-              initialValue: selectedKategori,
-              items: ['MAKANAN', 'MINUMAN', 'SNACK']
-                  .map((k) => DropdownMenuItem(value: k, child: Text(k)))
-                  .toList(),
+              value: selectedKategori,
+              items: kategoris.map((k) => DropdownMenuItem(value: k, child: Text(k))).toList(),
               onChanged: (val) => selectedKategori = val!,
               decoration: const InputDecoration(labelText: 'Kategori'),
             ),
@@ -83,32 +73,25 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Batal')),
           ElevatedButton(
             onPressed: () async {
+              // Simple validation
+              if (namaController.text.isEmpty || hargaController.text.isEmpty) return;
+
               Navigator.pop(context);
               setState(() => _isLoading = true);
-              
+
               bool success;
+              int harga = int.tryParse(hargaController.text) ?? 0;
+
               if (menu == null) {
-                // Add
-                success = await _ownerService.createMenu(
-                  namaController.text,
-                  int.tryParse(hargaController.text) ?? 0,
-                  selectedKategori
-                );
+                success = await _ownerService.createMenu(namaController.text, harga, selectedKategori);
               } else {
-                // Edit
-                success = await _ownerService.updateMenu(
-                  menu.id,
-                  namaController.text,
-                  int.tryParse(hargaController.text) ?? 0,
-                  selectedKategori
-                );
+                success = await _ownerService.updateMenu(menu.id, namaController.text, harga, selectedKategori);
               }
 
-              if (success) {
-                _fetchData();
-              } else {
+              if (success) _fetchMenus();
+              else {
                  setState(() => _isLoading = false);
-                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Gagal simpan menu')));
+                 if(mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Gagal simpan')));
               }
             },
             child: const Text('Simpan'),
@@ -123,20 +106,19 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Hapus Menu'),
-        content: Text('Yakin hapus ${menu.nama}?'),
+        content: Text('Hapus ${menu.nama}?'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Batal')),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
             onPressed: () async {
               Navigator.pop(context);
               setState(() => _isLoading = true);
               final success = await _ownerService.deleteMenu(menu.id);
-              if (success) {
-                _fetchData();
-              } else {
+               if (success) _fetchMenus();
+              else {
                  setState(() => _isLoading = false);
-                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Gagal hapus')));
+                 if(mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Gagal hapus')));
               }
             },
             child: const Text('Hapus'),
@@ -148,43 +130,121 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormat = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
-
     return Scaffold(
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: const Text('Kelola Menu'),
-        automaticallyImplyLeading: false, // Karena embed di dashboard (kadang)
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xFF5D4037),
+        elevation: 0,
+        leading: const SizedBox(), // Hide manual back button, use Dashboard logic if embedded
+        // Wait, if embedded, AppBar is confusing. But we're in 'Refined UI'.
+        // Let's assume standalone mode for child screens for now.
+        centerTitle: true,
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: _menus.length,
-              itemBuilder: (context, index) {
-                final menu = _menus[index];
-                return ListTile(
-                  leading: const CircleAvatar(child: Icon(Icons.fastfood)),
-                  title: Text(menu.nama),
-                  subtitle: Text("${menu.kategori} • ${currencyFormat.format(menu.harga)}"),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
+          : Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2, // 2 Kolom
+                  childAspectRatio: 0.75, // Aspect ratio card
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                ),
+                itemCount: _menus.length,
+                itemBuilder: (context, index) {
+                  final menu = _menus[index];
+                  return _buildMenuCard(menu);
+                },
+              ),
+            ),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: const Color(0xFF5D4037),
+        label: const Text("Tambah Menu", style: TextStyle(color: Colors.white)),
+        icon: const Icon(Icons.add, color: Colors.white),
+        onPressed: () => _showAddEditDialog(),
+      ),
+    );
+  }
+
+  Widget _buildMenuCard(MenuModel menu) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 8, offset: const Offset(0, 4))
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // IMAGE PLACEHOLDER
+          Expanded(
+            flex: 3,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              ),
+              child: Center(
+                child: Icon(
+                  menu.kategori == 'MINUMAN' ? Icons.local_cafe : Icons.restaurant,
+                  size: 48,
+                  color: Colors.grey[400],
+                ),
+              ),
+            ),
+          ),
+          // INFO
+          Expanded(
+            flex: 2,
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    menu.nama,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    currencyFormatter.format(menu.harga),
+                    style: const TextStyle(color: Color(0xFF5D4037), fontWeight: FontWeight.bold),
+                  ),
+                  const Spacer(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit, color: Colors.blue),
-                        onPressed: () => _showAddEditDialog(menu: menu),
+                      InkWell(
+                        onTap: () => _showAddEditDialog(menu: menu),
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(color: Colors.orange[50], borderRadius: BorderRadius.circular(8)),
+                          child: const Icon(Icons.edit, size: 20, color: Colors.orange),
+                        ),
                       ),
-                      // DELETE BUTTON (ALWAYS VISIBLE FOR OWNER APP)
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => _deleteMenu(menu),
+                      const SizedBox(width: 8),
+                      InkWell(
+                        onTap: () => _deleteMenu(menu),
+                         child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(color: Colors.red[50], borderRadius: BorderRadius.circular(8)),
+                          child: const Icon(Icons.delete, size: 20, color: Colors.red),
+                        ),
                       ),
                     ],
-                  ),
-                );
-              },
+                  )
+                ],
+              ),
             ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () => _showAddEditDialog(),
+          ),
+        ],
       ),
     );
   }
