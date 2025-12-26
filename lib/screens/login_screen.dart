@@ -58,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const Icon(Icons.coffee, size: 64, color: Color(0xFF5D4037)),
                 const SizedBox(height: 16),
                 const Text(
-                  'RK CAFE LOGIN',
+                  'RK CAFE App',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 24),
