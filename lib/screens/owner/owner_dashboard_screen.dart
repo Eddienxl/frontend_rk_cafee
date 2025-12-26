@@ -113,7 +113,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Halo, $_username! 👋",
+          "Halo Owner ",
           style: GoogleFonts.outfit(fontSize: 28, fontWeight: FontWeight.bold, color: const Color(0xFF5D4037)),
         ),
         const SizedBox(height: 4),
