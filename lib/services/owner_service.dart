@@ -161,4 +161,19 @@ class OwnerService {
     }
     return [];
   }
+
+  // ================= BAHAN BAKU =================
+  Future<List<Map<String, dynamic>>> getBahanBaku() async {
+    final url = Uri.parse('${ApiConfig.baseUrl}/bahan-baku');
+    final response = await http.get(url, headers: await _headers());
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      if (json['success'] == true) {
+        // Backend data: [ { id_bahan, nama_bahan, stok_awal, stok_masuk, stok_keluar, sisa_stok, satuan... } ]
+        return List<Map<String, dynamic>>.from(json['data']);
+      }
+    }
+    return [];
+  }
 }
