@@ -45,8 +45,15 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
     final namaCtrl = TextEditingController();
     final stokCtrl = TextEditingController();
     final minCtrl = TextEditingController();
-    String satuan = 'gram'; // Default
-    final satuanOptions = ['gram', 'ml', 'pcs', 'kg', 'liter', 'botol'];
+    String satuan = 'g'; // Default normalized to backend preference
+    final Map<String, String> satuanMap = {
+      'g': 'Gram (g)',
+      'kg': 'Kilogram (kg)',
+      'ml': 'Mililiter (ml)',
+      'l': 'Liter (l)',
+      'pcs': 'Pcs',
+      'botol': 'Botol'
+    };
 
     showDialog(
       context: context,
@@ -61,7 +68,7 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
               TextField(controller: minCtrl, decoration: const InputDecoration(labelText: "Stok Minimum"), keyboardType: TextInputType.number),
               DropdownButtonFormField<String>(
                 value: satuan,
-                items: satuanOptions.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                items: satuanMap.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
                 onChanged: (v) => satuan = v!,
                 decoration: const InputDecoration(labelText: "Satuan Dasar"),
               )
