@@ -102,46 +102,78 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
   // --- UPDATE (RESTOCK) ---
   void _showRestockDialog(Map<String, dynamic> item) {
     final jumlahCtrl = TextEditingController();
-    String satuan = item['satuan']; 
+    String satuanBase = item['satuan']; 
+    String satuanInput = satuanBase; // Default input sama dengan base
+
+    // Logika opsi satuan: Jika base 'g' atau 'ml', izinkan input 'kg' atau 'l'
+    List<String> validOptions = [satuanBase];
+    if (satuanBase == 'g') validOptions.add('kg');
+    if (satuanBase == 'ml') validOptions.add('l');
+    
+    // Mapping label UI
+    final Map<String, String> labelMap = {
+      'g': 'Gram (g)', 'kg': 'Kilogram (kg)',
+      'ml': 'Mililiter (ml)', 'l': 'Liter (l)',
+      'pcs': 'Pcs', 'botol': 'Botol'
+    };
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text("Update Stok: ${item['nama']}"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: jumlahCtrl, 
-              decoration: const InputDecoration(labelText: "Jumlah Tambah/Kurang (+/-)"), 
-              keyboardType: const TextInputType.numberWithOptions(signed: true)
-            ),
-            const SizedBox(height: 10),
-            Text("Satuan: $satuan (Otomatis)", style: const TextStyle(color: Colors.grey)),
-            // Nanti bisa dikembangkan agar user bisa pilih satuan input beda (konversi backend)
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Batal")),
-          ElevatedButton(
-            onPressed: () async {
-              if (jumlahCtrl.text.isEmpty) return;
-              Navigator.pop(context);
+      builder: (context) {
+        return StatefulBuilder( // Perlu StatefulBuilder agar dropdown bisa berubah state dalam Dialog
+          builder: (context, setStateDialog) {
+            return AlertDialog(
+              title: Text("Update Stok: ${item['nama']}"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: jumlahCtrl, 
+                    decoration: const InputDecoration(labelText: "Jumlah Tambah/Kurang (+/-)"), 
+                    keyboardType: const TextInputType.numberWithOptions(signed: true)
+                  ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    value: satuanInput,
+                    decoration: const InputDecoration(labelText: "Satuan Input"),
+                    items: validOptions.map((k) {
+                       return DropdownMenuItem(value: k, child: Text(labelMap[k] ?? k));
+                    }).toList(),
+                    onChanged: (val) {
+                      setStateDialog(() => satuanInput = val!);
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "Stok akan otomatis dikonversi ke ${labelMap[satuanBase]} oleh sistem.", 
+                    style: const TextStyle(color: Colors.grey, fontSize: 12)
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(context), child: const Text("Batal")),
+                ElevatedButton(
+                  onPressed: () async {
+                    if (jumlahCtrl.text.isEmpty) return;
+                    Navigator.pop(context);
 
-              final success = await _ownerService.updateBahanStok(
-                id: item['id'],
-                jumlah: double.tryParse(jumlahCtrl.text) ?? 0,
-                satuanInput: satuan,
-                keterangan: "Restock via Owner App"
-              );
+                    final success = await _ownerService.updateBahanStok(
+                      id: item['id'],
+                      jumlah: double.tryParse(jumlahCtrl.text) ?? 0,
+                      satuanInput: satuanInput, // Kirim satuan yang dipilih user (misal kg)
+                      keterangan: "Restock via Owner App ($satuanInput)"
+                    );
 
-              if (success) _fetchBahanBaku();
-              else if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Gagal update stok")));
-            },
-            child: const Text("Update"),
-          )
-        ],
-      ),
+                    if (success) _fetchBahanBaku();
+                    else if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Gagal update stok")));
+                  },
+                  child: const Text("Update"),
+                )
+              ],
+            );
+          }
+        );
+      },
     );
   }
 
