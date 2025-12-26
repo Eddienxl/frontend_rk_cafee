@@ -253,8 +253,8 @@ class _KasirPosScreenState extends State<KasirPosScreen> {
                 : GridView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3, // 3 Columns for compact layout
-                      childAspectRatio: 0.7, 
+                      crossAxisCount: 3, 
+                      childAspectRatio: 0.65, // More vertical space for lines
                       crossAxisSpacing: 12,
                       mainAxisSpacing: 12,
                     ),
@@ -275,6 +275,7 @@ class _KasirPosScreenState extends State<KasirPosScreen> {
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 Expanded(
+                                  flex: 3, // Give image 60% height
                                   child: Container(
                                     decoration: BoxDecoration(
                                       color: available ? Colors.brown[100] : Colors.grey[300],
@@ -283,7 +284,7 @@ class _KasirPosScreenState extends State<KasirPosScreen> {
                                     child: Stack(
                                       fit: StackFit.expand,
                                       children: [
-                                        Icon(Icons.coffee, size: 64, color: available ? Colors.brown : Colors.grey),
+                                        Icon(Icons.coffee, size: 50, color: available ? Colors.brown : Colors.grey),
                                         if (!available)
                                           Center(
                                             child: Container(
@@ -296,15 +297,24 @@ class _KasirPosScreenState extends State<KasirPosScreen> {
                                     ),
                                   ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.all(12),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(menu.nama, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16), maxLines: 1, overflow: TextOverflow.ellipsis),
-                                      const SizedBox(height: 4),
-                                      Text(currencyFormat.format(menu.harga), style: TextStyle(color: Colors.brown[800], fontWeight: FontWeight.w600)),
-                                    ],
+                                Expanded(
+                                  flex: 2, // Give text 40% height
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(10),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          menu.nama, 
+                                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14), 
+                                          maxLines: 2, // Allow 2 lines
+                                          overflow: TextOverflow.ellipsis
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(currencyFormat.format(menu.harga), style: TextStyle(color: Colors.brown[800], fontWeight: FontWeight.w600, fontSize: 13)),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ],
