@@ -151,8 +151,8 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
               child: GridView.builder(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3, // 3 Kolom
-                  childAspectRatio: 0.65, // Card lebih tinggi (sempit tapi muat konten)
-                  crossAxisSpacing: 12, // Spacing sedikit rapat
+                  childAspectRatio: 0.60, // Card lebih tinggi lagi agar harga aman
+                  crossAxisSpacing: 12, 
                   mainAxisSpacing: 12,
                 ),
                 itemCount: _menus.length,
@@ -195,17 +195,17 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
           children: [
             // IMAGE PLACEHOLDER (INITIALS)
             Expanded(
-              flex: 3,
+              flex: 1, // Kurangi porsi gambar biar imbang
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.brown[50], // Warna background soft
+                  color: Colors.brown[50], 
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                 ),
                 child: Center(
                   child: Text(
                     initials,
                     style: const TextStyle(
-                      fontSize: 32, 
+                      fontSize: 28, 
                       fontWeight: FontWeight.bold, 
                       color: Color(0xFF5D4037)
                     ),
@@ -215,9 +215,9 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
             ),
             // INFO
             Expanded(
-              flex: 2,
+              flex: 1, // Tambah porsi teks
               child: Padding(
-                padding: const EdgeInsets.all(12.0),
+                padding: const EdgeInsets.all(10.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
