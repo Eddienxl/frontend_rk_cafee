@@ -31,7 +31,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+        // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e'))); // Service already prints error
       }
     }
   }
@@ -86,7 +86,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
               } else {
                 // Edit
                 success = await _userService.updateUser(
-                  user.id, 
+                  user.idUser, 
                   passwordController.text.isEmpty ? null : passwordController.text, 
                   selectedRole
                 );
@@ -120,7 +120,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
             onPressed: () async {
               Navigator.pop(context);
               setState(() => _isLoading = true);
-              final success = await _userService.deleteUser(user.id);
+              final success = await _userService.deleteUser(user.idUser);
               if (success) {
                 _fetchUsers();
               } else {

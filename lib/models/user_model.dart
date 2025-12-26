@@ -1,44 +1,36 @@
 class UserModel {
-  final String id;
+  final String idUser;
   final String username;
   final String role;
   final String? token;
 
   UserModel({
-    required this.id,
+    required this.idUser,
     required this.username,
     required this.role,
     this.token,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
-    // Logic sederhana & defensif: Cari map yang punya key 'username' atau 'role'
-    // Prioritas: json['data']['user'] -> json['data'] -> json['user'] -> json
+    // Handle nested data structure if necessary
+    Map<String, dynamic> data = json;
     
-    Map<String, dynamic> userData = json;
-    
-    if (json['data'] is Map) {
-      final data = json['data'] as Map<String, dynamic>;
-      if (data['user'] is Map) {
-        userData = data['user'];
-      } else {
-        userData = data;
+    // Check if 'data' wrapper exists and has 'id_user' or 'user' object
+    if (json.containsKey('data')) {
+      if (json['data'] is Map && json['data'].containsKey('user')) {
+        data = json['data']['user'];
+      } else if (json['data'] is Map) {
+        data = json['data'];
       }
-    } else if (json['user'] is Map) {
-      userData = json['user'];
-    }
-
-    // Ekstrak token
-    String? token = json['token'];
-    if (token == null && json['data'] is Map) {
-      token = json['data']['token'];
+    } else if (json.containsKey('user')) {
+      data = json['user'];
     }
 
     return UserModel(
-      id: userData['id_user']?.toString() ?? userData['id']?.toString() ?? '',
-      username: userData['username']?.toString() ?? '',
-      role: (userData['role']?.toString() ?? 'KASIR').toUpperCase(),
-      token: token,
+      idUser: data['id_user']?.toString() ?? '',
+      username: data['username']?.toString() ?? '',
+      role: (data['role']?.toString() ?? 'KASIR').toUpperCase(),
+      token: json['token'] ?? (json['data'] is Map ? json['data']['token'] : null),
     );
   }
 }

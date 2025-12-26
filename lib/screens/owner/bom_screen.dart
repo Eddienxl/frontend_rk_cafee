@@ -56,8 +56,8 @@ class _BOMScreenState extends State<BOMScreen> {
       return;
     }
 
-    String? selectedMenuId = _menus.first.id;
-    String? selectedBahanId = _bahanBaku.first.id;
+    String? selectedMenuId = _menus.first.idMenu;
+    String? selectedBahanId = _bahanBaku.first.idBahan;
     final jumlahCtrl = TextEditingController();
 
     showDialog(
@@ -74,7 +74,7 @@ class _BOMScreenState extends State<BOMScreen> {
                     DropdownButtonFormField<String>(
                       value: selectedMenuId,
                       decoration: const InputDecoration(labelText: "Pilih Menu"),
-                      items: _menus.map((m) => DropdownMenuItem(value: m.id, child: Text(m.nama))).toList(),
+                      items: _menus.map((m) => DropdownMenuItem(value: m.idMenu, child: Text(m.nama))).toList(),
                       onChanged: (v) => setStateDialog(() => selectedMenuId = v),
                     ),
                     const SizedBox(height: 16),
@@ -82,7 +82,7 @@ class _BOMScreenState extends State<BOMScreen> {
                       value: selectedBahanId,
                       decoration: const InputDecoration(labelText: "Pilih Bahan Baku"),
                       items: _bahanBaku.map((b) => DropdownMenuItem<String>(
-                        value: b.id, 
+                        value: b.idBahan, 
                         child: Text("${b.nama} (${b.satuan})")
                       )).toList(),
                       onChanged: (v) => setStateDialog(() => selectedBahanId = v),
@@ -101,7 +101,7 @@ class _BOMScreenState extends State<BOMScreen> {
                 ElevatedButton(
                   onPressed: () async {
                     if (selectedMenuId == null || selectedBahanId == null || jumlahCtrl.text.isEmpty) return;
-                    Navigator.pop(context);
+                    Navigator.pop(context); // Close dialog first
 
                     final success = await _bomService.createBOM(
                       selectedMenuId!,

@@ -1,5 +1,5 @@
 class MenuModel {
-  final String id;
+  final String idMenu; // Matches BE id_menu
   final String nama;
   final int harga;
   final String kategori;
@@ -7,7 +7,7 @@ class MenuModel {
   final bool isAvailable;
 
   MenuModel({
-    required this.id,
+    required this.idMenu,
     required this.nama,
     required this.harga,
     required this.kategori,
@@ -27,7 +27,7 @@ class MenuModel {
     }
 
     return MenuModel(
-      id: json['id_menu']?.toString() ?? '',
+      idMenu: json['id_menu']?.toString() ?? '',
       nama: json['nama_menu'] ?? 'No Name',
       harga: hargaInt,
       kategori: json['kategori'] ?? 'UMUM',

@@ -30,11 +30,11 @@ class AuthService {
         // Simpan Token ke HP
         final prefs = await SharedPreferences.getInstance();
         if (user.token != null) {
-          await prefs.setString('token', user.token!);
+          await prefs.setString('auth_token', user.token!); // Key should be 'auth_token' to match UserService/etc
         }
         await prefs.setString('role', user.role);
         await prefs.setString('username', user.username);
-        await prefs.setString('user_id', user.id);
+        await prefs.setString('user_id', user.idUser);
 
         return user;
       } else {

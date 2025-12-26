@@ -141,7 +141,8 @@ class _LaporanScreenState extends State<LaporanScreen> {
                   
                   // STATISTIK GRAFIK (Dummy Representation)
                   // STATISTIK GRAFIK
-                  if (_laporanData!['statistik_harian'] != null && (_laporanData!['statistik_harian'] as List).isNotEmpty) ...[
+                  // STATISTIK GRAFIK (Dummy Representation)
+                  if (_laporanData!.containsKey('statistik_harian') && _laporanData!['statistik_harian'] != null && (_laporanData!['statistik_harian'] as List).isNotEmpty) ...[
                     const Align(alignment: Alignment.centerLeft, child: Text("Tren Penjualan", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18))),
                     const SizedBox(height: 12),
                     Container(
@@ -176,7 +177,7 @@ class _LaporanScreenState extends State<LaporanScreen> {
                     )
                   ] else ...[
                      const SizedBox(height: 24),
-                     const Center(child: Text("Data tren harian belum tersedia"))
+                     // const Center(child: Text("Data tren harian belum tersedia")) // Optional: Hide or show nice message
                   ]
                 ],
               )

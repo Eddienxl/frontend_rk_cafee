@@ -16,14 +16,18 @@ class BahanService {
 
   Future<List<BahanBakuModel>> getBahanBaku() async {
     final url = Uri.parse('${ApiConfig.baseUrl}/bahan');
-    final response = await http.get(url, headers: await _headers());
+    try {
+      final response = await http.get(url, headers: await _headers());
 
-    if (response.statusCode == 200) {
-      final json = jsonDecode(response.body);
-      if (json['success'] == true) {
-        final List data = json['data'];
-        return data.map((e) => BahanBakuModel.fromJson(e)).toList();
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        if (json['success'] == true) {
+          final List data = json['data'];
+          return data.map((e) => BahanBakuModel.fromJson(e)).toList();
+        }
       }
+    } catch (e) {
+      print("GetBahanBaku Error: $e");
     }
     return [];
   }
@@ -33,46 +37,61 @@ class BahanService {
     required double stok,
     required String satuan,
     required double min,
-    String? id,
+    String? idBahan,
   }) async {
     final url = Uri.parse('${ApiConfig.baseUrl}/bahan');
-    final response = await http.post(
-      url,
-      headers: await _headers(),
-      body: jsonEncode({
-        'id_bahan': id ?? 'BB-${DateTime.now().millisecondsSinceEpoch}',
-        'nama_bahan': nama,
-        'stok_saat_ini': stok,
-        'stok_minimum': min,
-        'satuan': satuan,
-        'satuan_input': satuan,
-      }),
-    );
-    return response.statusCode == 200 || response.statusCode == 201;
+    try {
+      final response = await http.post(
+        url,
+        headers: await _headers(),
+        body: jsonEncode({
+          'id_bahan': idBahan ?? 'BB-${DateTime.now().millisecondsSinceEpoch}',
+          'nama_bahan': nama,
+          'stok_saat_ini': stok,
+          'stok_minimum': min,
+          'satuan': satuan,
+          'satuan_input': satuan,
+        }),
+      );
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      print("CreateBahan Error: $e");
+      return false;
+    }
   }
 
   Future<bool> updateBahanStok({
-    required String id,
+    required String idBahan,
     required double jumlah,
     required String satuanInput,
     String keterangan = 'Update Manual',
   }) async {
-    final url = Uri.parse('${ApiConfig.baseUrl}/bahan/$id');
-    final response = await http.put(
-      url,
-      headers: await _headers(),
-      body: jsonEncode({
-        'jumlah': jumlah,
-        'satuan_input': satuanInput,
-        'keterangan': keterangan,
-      }),
-    );
-    return response.statusCode == 200;
+    final url = Uri.parse('${ApiConfig.baseUrl}/bahan/$idBahan');
+    try {
+      final response = await http.put(
+        url,
+        headers: await _headers(),
+        body: jsonEncode({
+          'jumlah': jumlah,
+          'satuan_input': satuanInput,
+          'keterangan': keterangan,
+        }),
+      );
+      return response.statusCode == 200;
+    } catch (e) {
+      print("UpdateBahanStok Error: $e");
+      return false;
+    }
   }
   
-  Future<bool> deleteBahan(String id) async {
-    final url = Uri.parse('${ApiConfig.baseUrl}/bahan/$id');
-    final response = await http.delete(url, headers: await _headers());
-    return response.statusCode == 200;
+  Future<bool> deleteBahan(String idBahan) async {
+    final url = Uri.parse('${ApiConfig.baseUrl}/bahan/$idBahan');
+    try {
+      final response = await http.delete(url, headers: await _headers());
+      return response.statusCode == 200;
+    } catch (e) {
+      print("DeleteBahan Error: $e");
+      return false;
+    }
   }
 }

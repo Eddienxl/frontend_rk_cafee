@@ -85,7 +85,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
               if (menu == null) {
                 success = await _menuService.createMenu(namaController.text, harga, selectedKategori);
               } else {
-                success = await _menuService.updateMenu(menu.id, namaController.text, harga, selectedKategori);
+                success = await _menuService.updateMenu(menu.idMenu, namaController.text, harga, selectedKategori);
               }
 
               if (success) {
@@ -115,7 +115,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
             onPressed: () async {
               Navigator.pop(context);
               setState(() => _isLoading = true);
-              final success = await _menuService.deleteMenu(menu.id);
+              final success = await _menuService.deleteMenu(menu.idMenu);
                if (success) {
                  _fetchMenus();
                } else {

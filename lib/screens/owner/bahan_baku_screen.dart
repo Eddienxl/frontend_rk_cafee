@@ -153,7 +153,7 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
                     Navigator.pop(context);
 
                     final success = await _bahanService.updateBahanStok(
-                      id: item.id,
+                      idBahan: item.idBahan,
                       jumlah: double.tryParse(jumlahCtrl.text) ?? 0,
                       satuanInput: satuanInput, // Kirim satuan yang dipilih user (misal kg)
                       keterangan: "Restock via Owner App ($satuanInput)"
@@ -185,7 +185,7 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () async {
               Navigator.pop(context);
-              final success = await _bahanService.deleteBahan(item.id);
+              final success = await _bahanService.deleteBahan(item.idBahan);
               if (success) _fetchBahanBaku();
               else if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Gagal hapus bahan")));
             },

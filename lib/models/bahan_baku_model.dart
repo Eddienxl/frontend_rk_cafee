@@ -1,12 +1,12 @@
 class BahanBakuModel {
-  final String id;
+  final String idBahan;
   final String nama;
   final double stokSaatIni;
   final double stokMinimum;
   final String satuan;
 
   BahanBakuModel({
-    required this.id,
+    required this.idBahan,
     required this.nama,
     required this.stokSaatIni,
     required this.stokMinimum,
@@ -23,7 +23,7 @@ class BahanBakuModel {
     }
 
     return BahanBakuModel(
-      id: json['id_bahan']?.toString() ?? '',
+      idBahan: json['id_bahan']?.toString() ?? '',
       nama: json['nama_bahan'] ?? 'Tanpa Nama',
       stokSaatIni: toDouble(json['stok_saat_ini']),
       stokMinimum: toDouble(json['stok_minimum']),

@@ -38,12 +38,12 @@ class _KasirDashboardScreenState extends State<KasirDashboardScreen> {
 
   void _addToCart(MenuModel menu) {
     setState(() {
-      final index = _cart.indexWhere((item) => item.idMenu == menu.id);
+      final index = _cart.indexWhere((item) => item.idMenu == menu.idMenu);
       if (index != -1) {
         _cart[index].quantity++;
       } else {
         _cart.add(CartItemModel(
-          idMenu: menu.id,
+          idMenu: menu.idMenu,
           namaMenu: menu.nama,
           harga: menu.harga,
         ));

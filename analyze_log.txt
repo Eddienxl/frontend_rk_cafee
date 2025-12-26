@@ -1,0 +1,65 @@
+Analyzing RK_CAFEE_APP_FE...                                    
+
+   info - Statements in an if should be enclosed in a block - lib\screens\barista\barista_dashboard_screen.dart:51:34 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\barista\barista_dashboard_screen.dart:52:48 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\barista\barista_dashboard_screen.dart:53:10 - curly_braces_in_flow_control_structures
+   info - The private field _cart could be 'final' - lib\screens\kasir\kasir_dashboard_screen.dart:20:23 - prefer_final_fields
+   info - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre - lib\screens\owner\bahan_baku_screen.dart:65:17 - deprecated_member_use
+   info - Statements in an if should be enclosed in a block - lib\screens\owner\bahan_baku_screen.dart:87:28 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\owner\bahan_baku_screen.dart:88:33 - curly_braces_in_flow_control_structures
+   info - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre - lib\screens\owner\bahan_baku_screen.dart:132:21 - deprecated_member_use
+   info - Statements in an if should be enclosed in a block - lib\screens\owner\bahan_baku_screen.dart:162:34 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\owner\bahan_baku_screen.dart:163:39 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\owner\bahan_baku_screen.dart:189:28 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\owner\bahan_baku_screen.dart:190:33 - curly_braces_in_flow_control_structures
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\owner\bahan_baku_screen.dart:309:78 - deprecated_member_use
+  error - Missing concrete implementation of 'abstract class State<T extends StatefulWidget> with Diagnosticable.build' - lib\screens\owner\bom_screen.dart:16:7 - non_abstract_class_inherits_abstract_member
+warning - The value of the field '_menus' isn't used - lib\screens\owner\bom_screen.dart:22:19 - unused_field
+warning - The value of the field '_bahanBaku' isn't used - lib\screens\owner\bom_screen.dart:23:24 - unused_field
+  error - Expected to find ';' - lib\screens\owner\bom_screen.dart:50:100 - expected_token
+  error - Expected an identifier - lib\screens\owner\bom_screen.dart:50:101 - missing_identifier
+  error - Unexpected text ';' - lib\screens\owner\bom_screen.dart:50:101 - unexpected_token
+  error - Undefined name 'selectedMenuId' - lib\screens\owner\bom_screen.dart:53:25 - undefined_identifier
+  error - Undefined name 'selectedBahanId' - lib\screens\owner\bom_screen.dart:53:51 - undefined_identifier
+  error - Undefined name 'jumlahCtrl' - lib\screens\owner\bom_screen.dart:53:78 - undefined_identifier
+  error - Undefined name 'selectedMenuId' - lib\screens\owner\bom_screen.dart:57:23 - undefined_identifier
+  error - Undefined name 'selectedBahanId' - lib\screens\owner\bom_screen.dart:58:23 - undefined_identifier
+  error - Undefined name 'jumlahCtrl' - lib\screens\owner\bom_screen.dart:59:39 - undefined_identifier
+   info - Statements in an if should be enclosed in a block - lib\screens\owner\bom_screen.dart:62:34 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\owner\bom_screen.dart:63:39 - curly_braces_in_flow_control_structures
+  error - Expected to find ';' - lib\screens\owner\bom_screen.dart:66:17 - expected_token
+  error - Expected an identifier - lib\screens\owner\bom_screen.dart:67:15 - missing_identifier
+  error - Expected to find ';' - lib\screens\owner\bom_screen.dart:67:15 - expected_token
+  error - Unexpected text ';' - lib\screens\owner\bom_screen.dart:67:15 - unexpected_token
+  error - Expected an identifier - lib\screens\owner\bom_screen.dart:67:16 - missing_identifier
+  error - Expected to find ';' - lib\screens\owner\bom_screen.dart:67:16 - expected_token
+  error - Unexpected text ';' - lib\screens\owner\bom_screen.dart:67:16 - unexpected_token
+  error - Expected an identifier - lib\screens\owner\bom_screen.dart:68:13 - missing_identifier
+  error - Unexpected text ';' - lib\screens\owner\bom_screen.dart:68:13 - unexpected_token
+   info - Unnecessary empty statement - lib\screens\owner\bom_screen.dart:68:14 - empty_statements
+  error - Expected a class member - lib\screens\owner\bom_screen.dart:70:9 - expected_class_member
+  error - Expected a class member - lib\screens\owner\bom_screen.dart:70:10 - expected_class_member
+  error - Expected a method, getter, setter or operator declaration - lib\screens\owner\bom_screen.dart:71:8 - expected_executable
+  error - Expected a method, getter, setter or operator declaration - lib\screens\owner\bom_screen.dart:72:5 - expected_executable
+  error - Unexpected text ';' - lib\screens\owner\bom_screen.dart:72:6 - unexpected_token
+  error - Expected a method, getter, setter or operator declaration - lib\screens\owner\bom_screen.dart:73:3 - expected_executable
+  error - Undefined name 'context' - lib\screens\owner\bom_screen.dart:78:16 - undefined_identifier
+  error - Undefined name '_bomService' - lib\screens\owner\bom_screen.dart:88:37 - undefined_identifier
+   info - Statements in an if should be enclosed in a block - lib\screens\owner\bom_screen.dart:89:29 - curly_braces_in_flow_control_structures
+  error - The function '_fetchData' isn't defined - lib\screens\owner\bom_screen.dart:89:29 - undefined_function
+  error - Undefined name 'mounted' - lib\screens\owner\bom_screen.dart:90:24 - undefined_identifier
+   info - Statements in an if should be enclosed in a block - lib\screens\owner\bom_screen.dart:90:33 - curly_braces_in_flow_control_structures
+  error - Undefined name '_isLoading' - lib\screens\owner\bom_screen.dart:109:13 - undefined_identifier
+  error - Undefined name '_bomList' - lib\screens\owner\bom_screen.dart:111:13 - undefined_identifier
+  error - Undefined name '_bomList' - lib\screens\owner\bom_screen.dart:115:30 - undefined_identifier
+  error - Undefined name '_bomList' - lib\screens\owner\bom_screen.dart:117:34 - undefined_identifier
+  error - Undefined name '_showAddDialog' - lib\screens\owner\bom_screen.dart:149:20 - undefined_identifier
+  error - Expected a method, getter, setter or operator declaration - lib\screens\owner\bom_screen.dart:155:1 - expected_executable
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\owner\laporan_screen.dart:196:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\owner\owner_dashboard_screen.dart:143:40 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\owner\owner_dashboard_screen.dart:145:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\owner\owner_dashboard_screen.dart:152:28 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\owner\owner_dashboard_screen.dart:184:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\owner\owner_dashboard_screen.dart:193:32 - deprecated_member_use
+   info - Use interpolation to compose strings and values - lib\services\menu_service.dart:43:22 - prefer_interpolation_to_compose_strings
+
