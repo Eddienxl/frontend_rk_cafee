@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
 import 'kasir_pos_screen.dart';
 import 'kasir_status_order_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class KasirDashboardScreen extends StatefulWidget {
   const KasirDashboardScreen({super.key});
@@ -13,7 +14,7 @@ class KasirDashboardScreen extends StatefulWidget {
 class _KasirDashboardScreenState extends State<KasirDashboardScreen> {
   final AuthService _authService = AuthService();
   String _username = '';
-  String _role = 'Kasir'; // Default
+  String _role = 'Kasir'; 
   int _selectedIndex = 0;
 
   final List<Widget> _screens = [
@@ -22,7 +23,7 @@ class _KasirDashboardScreenState extends State<KasirDashboardScreen> {
   ];
   
   final List<String> _titles = [
-    "Buat Pesanan",
+    "Panel Kasir",
     "Status Pesanan",
   ];
 
@@ -36,7 +37,7 @@ class _KasirDashboardScreenState extends State<KasirDashboardScreen> {
     final user = await _authService.getUser();
     setState(() {
       _username = user['username'] ?? 'Kasir';
-      _role = user['role'] ?? 'Kasir';
+      _role = user['role'] ?? 'KASIR';
     });
   }
 
@@ -44,7 +45,7 @@ class _KasirDashboardScreenState extends State<KasirDashboardScreen> {
     setState(() {
       _selectedIndex = index;
     });
-    Navigator.pop(context); // Close Drawer
+    Navigator.pop(context); 
   }
 
   void _logout() async {
@@ -55,44 +56,46 @@ class _KasirDashboardScreenState extends State<KasirDashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFBF8F6),
       appBar: AppBar(
-        title: Text(_titles[_selectedIndex], style: const TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.brown,
+        title: Text(_titles[_selectedIndex], style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
+        backgroundColor: const Color(0xFF5D4037),
         foregroundColor: Colors.white,
+        centerTitle: true,
+        elevation: 0,
       ),
       drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
+        child: Column(
           children: [
             UserAccountsDrawerHeader(
-              decoration: const BoxDecoration(color: Colors.brown),
-              accountName: Text(_username, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              accountEmail: Text(_role),
+              decoration: const BoxDecoration(color: Color(0xFF5D4037)),
+              accountName: Text(_username, style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold)),
+              accountEmail: Text("Role: $_role", style: GoogleFonts.inter()),
               currentAccountPicture: const CircleAvatar(
                 backgroundColor: Colors.white,
-                child: Icon(Icons.person, size: 40, color: Colors.brown),
+                child: Icon(Icons.person, size: 40, color: Color(0xFF5D4037)),
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.point_of_sale, color: Colors.brown),
-              title: const Text("Buat Pesanan"),
+              leading: const Icon(Icons.shopping_cart_outlined, color: Color(0xFF5D4037)),
+              title: Text("Buat Pesanan", style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
               selected: _selectedIndex == 0,
-              selectedColor: Colors.amber[900],
               onTap: () => _onItemTapped(0),
             ),
             ListTile(
-              leading: const Icon(Icons.receipt_long, color: Colors.brown),
-              title: const Text("Status Pesanan"),
+              leading: const Icon(Icons.history_toggle_off_rounded, color: Color(0xFF5D4037)),
+              title: Text("Status Pesanan", style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
               selected: _selectedIndex == 1,
-              selectedColor: Colors.amber[900],
               onTap: () => _onItemTapped(1),
             ),
+            const Spacer(),
             const Divider(),
             ListTile(
-              leading: const Icon(Icons.logout, color: Colors.red),
-              title: const Text("Keluar", style: TextStyle(color: Colors.red)),
+              leading: const Icon(Icons.logout_rounded, color: Colors.red),
+              title: Text("Keluar", style: GoogleFonts.inter(color: Colors.red, fontWeight: FontWeight.bold)),
               onTap: _logout,
             ),
+            const SizedBox(height: 20),
           ],
         ),
       ),
