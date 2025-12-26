@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_rk_cafee/services/owner_service.dart';
 import 'package:frontend_rk_cafee/models/menu_model.dart';
+import 'package:frontend_rk_cafee/models/bahan_baku_model.dart';
+import 'package:frontend_rk_cafee/models/bom_model.dart';
 
 class BOMScreen extends StatefulWidget {
   const BOMScreen({super.key});
@@ -11,9 +13,9 @@ class BOMScreen extends StatefulWidget {
 
 class _BOMScreenState extends State<BOMScreen> {
   final OwnerService _ownerService = OwnerService();
-  List<Map<String, dynamic>> _bomList = [];
+  List<BOMModel> _bomList = [];
   List<MenuModel> _menus = [];
-  List<Map<String, dynamic>> _bahanBaku = [];
+  List<BahanBakuModel> _bahanBaku = [];
   bool _isLoading = true;
 
   @override
@@ -50,7 +52,7 @@ class _BOMScreenState extends State<BOMScreen> {
     }
 
     String? selectedMenuId = _menus.first.id;
-    String? selectedBahanId = _bahanBaku.first['id_bahan'];
+    String? selectedBahanId = _bahanBaku.first.id;
     final jumlahCtrl = TextEditingController();
 
     showDialog(
@@ -75,8 +77,8 @@ class _BOMScreenState extends State<BOMScreen> {
                       value: selectedBahanId,
                       decoration: const InputDecoration(labelText: "Pilih Bahan Baku"),
                       items: _bahanBaku.map((b) => DropdownMenuItem<String>(
-                        value: b['id_bahan'], 
-                        child: Text("${b['nama_bahan']} (${b['satuan']})")
+                        value: b.id, 
+                        child: Text("${b.nama} (${b.satuan})")
                       )).toList(),
                       onChanged: (v) => setStateDialog(() => selectedBahanId = v),
                     ),
@@ -157,30 +159,28 @@ class _BOMScreenState extends State<BOMScreen> {
                   padding: const EdgeInsets.all(16),
                   itemCount: _bomList.length,
                   itemBuilder: (context, index) {
-                    final menuMap = _bomList[index];
-                    final resepList = (menuMap['resep'] as List? ?? []);
+                    final item = _bomList[index];
 
                     return Card(
                       margin: const EdgeInsets.only(bottom: 16),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       elevation: 3,
                       child: ExpansionTile(
-                        title: Text(menuMap['nama_menu'] ?? 'Menu Unknown', style: const TextStyle(fontWeight: FontWeight.bold)),
-                        subtitle: Text("${resepList.length} Bahan Baku"),
-                        children: resepList.map<Widget>((r) {
+                        title: Text(item.namaMenu, style: const TextStyle(fontWeight: FontWeight.bold)),
+                        subtitle: Text("${item.resep.length} Bahan Baku"),
+                        children: item.resep.map<Widget>((r) {
                           return ListTile(
                             dense: true,
                             leading: const Icon(Icons.circle, size: 8, color: Colors.brown),
-                            title: Text(r['nama_bahan'] ?? '-'),
+                            title: Text(r.namaBahan),
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text("${r['jumlah_dibutuhkan']} ${r['satuan']}", style: const TextStyle(fontWeight: FontWeight.bold)),
-                                // Only show delete if id_bom exists (it should now)
-                                if (r['id_bom'] != null)
+                                Text("${r.jumlahDibutuhkan} ${r.satuan}", style: const TextStyle(fontWeight: FontWeight.bold)),
+                                if (r.idBom != null)
                                   IconButton(
                                     icon: const Icon(Icons.delete, color: Colors.grey, size: 18),
-                                    onPressed: () => _deleteItem(r['id_bom'], r['nama_bahan'] ?? 'Item'),
+                                    onPressed: () => _deleteItem(r.idBom!, r.namaBahan),
                                   )
                               ],
                             ),

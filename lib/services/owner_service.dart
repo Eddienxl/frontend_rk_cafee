@@ -5,6 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../config/api_config.dart';
 import '../models/user_model.dart';
 import '../models/menu_model.dart';
+import '../models/bahan_baku_model.dart';
+import '../models/bom_model.dart';
 
 class OwnerService {
   
@@ -148,24 +150,22 @@ class OwnerService {
   }
 
   // ================= BOM / RESEP =================
-  Future<List<Map<String, dynamic>>> getBOM() async {
+  Future<List<BOMModel>> getBOM() async {
     final url = Uri.parse('${ApiConfig.baseUrl}/bom');
     final response = await http.get(url, headers: await _headers());
 
     if (response.statusCode == 200) {
       final json = jsonDecode(response.body);
       if (json['success'] == true) {
-        // Backend returns: data: [ { id_menu, nama_menu, resep: [...] }, ... ]
-        return List<Map<String, dynamic>>.from(json['data']);
+        final List data = json['data'];
+        return data.map((e) => BOMModel.fromJson(e)).toList();
       }
     }
     return [];
   }
 
   Future<bool> createBOM(String idMenu, String idBahan, double jumlah) async {
-    final url = Uri.parse('${ApiConfig.baseUrl}/bom'); // POST /bom creates strict BOM structure
-    // Backend expects: { id_menu: "...", bahan: [ { id_bahan: "...", jumlah_dibutuhkan: 10 } ] }
-    
+    final url = Uri.parse('${ApiConfig.baseUrl}/bom');
     final response = await http.post(
       url,
       headers: await _headers(),
@@ -189,15 +189,15 @@ class OwnerService {
   }
 
   // ================= BAHAN BAKU =================
-  Future<List<Map<String, dynamic>>> getBahanBaku() async {
+  Future<List<BahanBakuModel>> getBahanBaku() async {
     final url = Uri.parse('${ApiConfig.baseUrl}/bahan');
     final response = await http.get(url, headers: await _headers());
 
     if (response.statusCode == 200) {
       final json = jsonDecode(response.body);
       if (json['success'] == true) {
-        // Backend data: [ { id_bahan, nama_bahan, stok_awal, stok_masuk, stok_keluar, sisa_stok, satuan... } ]
-        return List<Map<String, dynamic>>.from(json['data']);
+        final List data = json['data'];
+        return data.map((e) => BahanBakuModel.fromJson(e)).toList();
       }
     }
     return [];

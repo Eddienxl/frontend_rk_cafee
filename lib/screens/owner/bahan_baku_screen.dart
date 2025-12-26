@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_rk_cafee/services/owner_service.dart';
+import 'package:frontend_rk_cafee/models/bahan_baku_model.dart';
 
 class BahanBakuScreen extends StatefulWidget {
   const BahanBakuScreen({super.key});
@@ -10,7 +11,7 @@ class BahanBakuScreen extends StatefulWidget {
 
 class _BahanBakuScreenState extends State<BahanBakuScreen> {
   final OwnerService _ownerService = OwnerService();
-  List<Map<String, dynamic>> _bahanBaku = [];
+  List<BahanBakuModel> _bahanBaku = [];
   bool _isLoading = true;
 
   @override
@@ -25,13 +26,7 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
       final data = await _ownerService.getBahanBaku();
       if (mounted) {
         setState(() {
-          _bahanBaku = data.map((item) => {
-            'id': item['id_bahan'],
-            'nama': item['nama_bahan'],
-            'stok': (item['stok_saat_ini'] ?? 0), 
-            'satuan': item['satuan'],
-            'min': (item['stok_minimum'] ?? 5),
-          }).toList();
+          _bahanBaku = data;
           _isLoading = false;
         });
       }
@@ -100,9 +95,9 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
   }
 
   // --- UPDATE (RESTOCK) ---
-  void _showRestockDialog(Map<String, dynamic> item) {
+  void _showRestockDialog(BahanBakuModel item) {
     final jumlahCtrl = TextEditingController();
-    String satuanBase = item['satuan']; 
+    String satuanBase = item.satuan; 
     String satuanInput = satuanBase; // Default input sama dengan base
 
     // Logika opsi satuan: Jika base 'g' atau 'ml', izinkan input 'kg' atau 'l'
@@ -123,7 +118,7 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
         return StatefulBuilder( // Perlu StatefulBuilder agar dropdown bisa berubah state dalam Dialog
           builder: (context, setStateDialog) {
             return AlertDialog(
-              title: Text("Update Stok: ${item['nama']}"),
+              title: Text("Update Stok: ${item.nama}"),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -158,7 +153,7 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
                     Navigator.pop(context);
 
                     final success = await _ownerService.updateBahanStok(
-                      id: item['id'],
+                      id: item.id,
                       jumlah: double.tryParse(jumlahCtrl.text) ?? 0,
                       satuanInput: satuanInput, // Kirim satuan yang dipilih user (misal kg)
                       keterangan: "Restock via Owner App ($satuanInput)"
@@ -178,19 +173,19 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
   }
 
   // --- DELETE ---
-  void _deleteBahan(Map<String, dynamic> item) {
+  void _deleteBahan(BahanBakuModel item) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text("Hapus Bahan"),
-        content: Text("Yakin hapus ${item['nama']}?"),
+        content: Text("Yakin hapus ${item.nama}?"),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text("Batal")),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () async {
               Navigator.pop(context);
-              final success = await _ownerService.deleteBahan(item['id']);
+              final success = await _ownerService.deleteBahan(item.id);
               if (success) _fetchBahanBaku();
               else if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Gagal hapus bahan")));
             },
@@ -230,7 +225,7 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
                                 children: [
                                   const Text("Stok Menipis", style: TextStyle(color: Colors.red)),
                                   Text(
-                                    "${_bahanBaku.where((b) => (b['stok'] as num) < (b['min'] as num)).length} Item",
+                                    "${_bahanBaku.where((b) => b.stokSaatIni < b.stokMinimum).length} Item",
                                     style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.red),
                                   ),
                                 ],
@@ -270,8 +265,8 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
                           separatorBuilder: (context, index) => const Divider(),
                           itemBuilder: (context, index) {
                             final item = _bahanBaku[index];
-                            final stok = (item['stok'] is num) ? item['stok'] : double.tryParse(item['stok'].toString()) ?? 0;
-                            final min = (item['min'] is num) ? item['min'] : double.tryParse(item['min'].toString()) ?? 0;
+                            final stok = item.stokSaatIni;
+                            final min = item.stokMinimum;
                             final isLow = stok < min;
 
                             return ListTile(
@@ -279,12 +274,12 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
                                 backgroundColor: isLow ? Colors.red[100] : Colors.blue[100],
                                 child: Icon(Icons.inventory_2, color: isLow ? Colors.red : Colors.blue),
                               ),
-                              title: Text(item['nama'], style: const TextStyle(fontWeight: FontWeight.bold)),
-                              subtitle: Text("Min: $min ${item['satuan']}"),
+                              title: Text(item.nama, style: const TextStyle(fontWeight: FontWeight.bold)),
+                              subtitle: Text("Min: $min ${item.satuan}"),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Text("$stok ${item['satuan']}",
+                                  Text("$stok ${item.satuan}",
                                       style: TextStyle(
                                           fontSize: 16, fontWeight: FontWeight.bold, color: isLow ? Colors.red : Colors.black)),
                                   const SizedBox(width: 12),
