@@ -254,7 +254,7 @@ class _KasirPosScreenState extends State<KasirPosScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3, 
-                      childAspectRatio: 0.65, // More vertical space for lines
+                      childAspectRatio: 0.60, // Taller card to fix overflow
                       crossAxisSpacing: 12,
                       mainAxisSpacing: 12,
                     ),
@@ -300,19 +300,19 @@ class _KasirPosScreenState extends State<KasirPosScreen> {
                                 Expanded(
                                   flex: 2, // Give text 40% height
                                   child: Padding(
-                                    padding: const EdgeInsets.all(10),
+                                    padding: const EdgeInsets.all(8), // Reduced padding
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Text(
                                           menu.nama, 
-                                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14), 
-                                          maxLines: 2, // Allow 2 lines
+                                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13), // Reduced font
+                                          maxLines: 2, 
                                           overflow: TextOverflow.ellipsis
                                         ),
                                         const SizedBox(height: 4),
-                                        Text(currencyFormat.format(menu.harga), style: TextStyle(color: Colors.brown[800], fontWeight: FontWeight.w600, fontSize: 13)),
+                                        Text(currencyFormat.format(menu.harga), style: TextStyle(color: Colors.brown[800], fontWeight: FontWeight.w600, fontSize: 12)), // Reduced font
                                       ],
                                     ),
                                   ),
