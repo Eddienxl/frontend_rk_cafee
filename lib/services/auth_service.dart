@@ -34,6 +34,7 @@ class AuthService {
         }
         await prefs.setString('role', user.role);
         await prefs.setString('username', user.username);
+        await prefs.setString('user_id', user.id);
 
         return user;
       } else {

@@ -25,19 +25,20 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() => _isLoading = false);
 
-    if (user != null) {
-      // Login Sukses
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const DashboardScreen()),
-        );
+    if (user != null && mounted) {
+      // Route based on Role
+      if (user.role == 'KASIR') {
+        Navigator.pushReplacementNamed(context, '/kasir');
+      } else if (user.role == 'BARISTA') {
+        Navigator.pushReplacementNamed(context, '/barista');
+      } else {
+        // OWNER or Others
+        Navigator.pushReplacementNamed(context, '/dashboard');
       }
     } else {
-      // Login Gagal
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login Gagal! Cek username/password')),
+          const SnackBar(content: Text('Login Gagal, Cek Username/Password')),
         );
       }
     }
