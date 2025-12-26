@@ -168,10 +168,10 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                       : GridView.builder(
                           padding: const EdgeInsets.all(16),
                           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2, // 2 Columns for better view on mobile
-                            childAspectRatio: 0.8,
-                            crossAxisSpacing: 16, 
-                            mainAxisSpacing: 16,
+                            crossAxisCount: 3, // Change to 3 columns
+                            childAspectRatio: 0.60, // Adjusted for 3 columns
+                            crossAxisSpacing: 12, 
+                            mainAxisSpacing: 12,
                           ),
                           itemCount: filteredMenus.length,
                           itemBuilder: (context, index) {
@@ -236,9 +236,9 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
     return Card(
       elevation: 4,
       shadowColor: Colors.black12,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)), // Slightly smaller radius
       child: InkWell(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         onTap: () => _showActionDialog(menu),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -248,31 +248,31 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.brown[50], 
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                 ),
                 child: Center(
-                  child: Icon(Icons.coffee, size: 40, color: Colors.brown[300]),
+                  child: Icon(Icons.coffee, size: 30, color: Colors.brown[300]), // Smaller icon
                 ),
               ),
             ),
             Expanded(
               flex: 2,
               child: Padding(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(8), // Reduced padding
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       menu.nama,
-                      maxLines: 1,
+                      maxLines: 2, // Allow 2 lines for 3-column layout
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 14),
+                      style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 12), // Reduced font
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 2),
                     Text(
                       currencyFormatter.format(menu.harga),
-                      style: GoogleFonts.inter(color: Colors.brown[700], fontWeight: FontWeight.bold, fontSize: 13),
+                      style: GoogleFonts.inter(color: Colors.brown[700], fontWeight: FontWeight.bold, fontSize: 11), // Reduced font
                     ),
                   ],
                 ),

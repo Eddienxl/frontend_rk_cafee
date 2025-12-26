@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'user_management_screen.dart';
@@ -95,17 +94,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
           const SizedBox(height: 24),
 
-          // CHART SECTION
-          _buildChartSection(),
-          const SizedBox(height: 32),
-          
+          // NAVIGATION GRID
           Text(
             "Manajemen Sistem",
             style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold, color: const Color(0xFF5D4037)),
           ),
           const SizedBox(height: 16),
           
-          // NAVIGATION GRID
           _buildNavigationGrid(),
           const SizedBox(height: 40),
         ],
@@ -127,58 +122,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           style: GoogleFonts.inter(fontSize: 14, color: Colors.grey[600]),
         ),
       ],
-    );
-  }
-
-  Widget _buildChartSection() {
-    return Container(
-      width: double.infinity,
-      height: 250,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 20, offset: const Offset(0, 8))
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("Grafik Penjualan", style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16)),
-          const SizedBox(height: 16),
-          Expanded(
-            child: LineChart(
-              LineChartData(
-                gridData: const FlGridData(show: false),
-                titlesData: const FlTitlesData(show: false),
-                borderData: FlBorderData(show: false),
-                lineBarsData: [
-                  LineChartBarData(
-                    spots: [
-                      const FlSpot(0, 3),
-                      const FlSpot(1, 1),
-                      const FlSpot(2, 4),
-                      const FlSpot(3, 2),
-                      const FlSpot(4, 5),
-                      const FlSpot(5, 3),
-                      const FlSpot(6, 4),
-                    ],
-                    isCurved: true,
-                    color: const Color(0xFF5D4037),
-                    barWidth: 4,
-                    dotData: const FlDotData(show: false),
-                    belowBarData: BarAreaData(
-                      show: true,
-                      color: const Color(0xFF5D4037).withOpacity(0.1),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../services/laporan_service.dart';
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:fl_chart/fl_chart.dart';
 
 class LaporanScreen extends StatefulWidget {
   const LaporanScreen({super.key});
@@ -92,11 +91,6 @@ class _LaporanScreenState extends State<LaporanScreen> {
                   ),
                   const SizedBox(height: 32),
                   
-                  Text("Tren Penjualan", style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 16),
-                  _buildChartSection(),
-                  
-                  const SizedBox(height: 32),
                   Text("Menu Terlaris", style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 16),
                   ...(_laporanData!['menu_terlaris'] as List).map((m) => _buildTopMenuItem(m)),
@@ -154,36 +148,6 @@ class _LaporanScreenState extends State<LaporanScreen> {
           const SizedBox(height: 4),
           Text(value, style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold)),
         ],
-      ),
-    );
-  }
-
-  Widget _buildChartSection() {
-    // Generate dummy spots based on data if available, or just mock it for "Perjelas"
-    return Container(
-      height: 200,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 20, offset: const Offset(0, 8))],
-      ),
-      child: BarChart(
-        BarChartData(
-          alignment: BarChartAlignment.spaceAround,
-          maxY: 20,
-          barTouchData: BarTouchData(enabled: false),
-          titlesData: const FlTitlesData(show: false),
-          gridData: const FlGridData(show: false),
-          borderData: FlBorderData(show: false),
-          barGroups: [
-            BarChartGroupData(x: 0, barRods: [BarChartRodData(toY: 8, color: const Color(0xFF5D4037), width: 16, borderRadius: BorderRadius.circular(4))]),
-            BarChartGroupData(x: 1, barRods: [BarChartRodData(toY: 15, color: const Color(0xFF5D4037), width: 16, borderRadius: BorderRadius.circular(4))]),
-            BarChartGroupData(x: 2, barRods: [BarChartRodData(toY: 10, color: const Color(0xFF5D4037), width: 16, borderRadius: BorderRadius.circular(4))]),
-            BarChartGroupData(x: 3, barRods: [BarChartRodData(toY: 18, color: const Color(0xFF5D4037), width: 16, borderRadius: BorderRadius.circular(4))]),
-            BarChartGroupData(x: 4, barRods: [BarChartRodData(toY: 12, color: const Color(0xFF5D4037), width: 16, borderRadius: BorderRadius.circular(4))]),
-          ],
-        ),
       ),
     );
   }
