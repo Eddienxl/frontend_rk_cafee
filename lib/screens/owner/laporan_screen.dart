@@ -140,38 +140,44 @@ class _LaporanScreenState extends State<LaporanScreen> {
                   const SizedBox(height: 24),
                   
                   // STATISTIK GRAFIK (Dummy Representation)
-                  const Align(alignment: Alignment.centerLeft, child: Text("Tren Penjualan", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18))),
-                  const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-                    child: Column(
-                      children: (_laporanData!['statistik_harian'] as List).map((day) {
-                        double omzet = (day['omzet'] as int).toDouble();
-                        double maxOmzet = 2000000; // Asumsi max dummy
-                        double percent = (omzet / maxOmzet).clamp(0.0, 1.0);
-                        
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 12.0),
-                          child: Row(
-                            children: [
-                              SizedBox(width: 60, child: Text(day['hari'], style: const TextStyle(fontWeight: FontWeight.bold))),
-                              Expanded(
-                                child: Stack(
-                                  children: [
-                                    Container(height: 12, decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(6))),
-                                    FractionallySizedBox(widthFactor: percent, child: Container(height: 12, decoration: BoxDecoration(color: const Color(0xFF5D4037), borderRadius: BorderRadius.circular(6)))),
-                                  ],
+                  // STATISTIK GRAFIK
+                  if (_laporanData!['statistik_harian'] != null && (_laporanData!['statistik_harian'] as List).isNotEmpty) ...[
+                    const Align(alignment: Alignment.centerLeft, child: Text("Tren Penjualan", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18))),
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+                      child: Column(
+                        children: (_laporanData!['statistik_harian'] as List).map((day) {
+                          double omzet = (day['omzet'] is int) ? (day['omzet'] as int).toDouble() : (day['omzet'] as double);
+                          double maxOmzet = 2000000; 
+                          double percent = (omzet / maxOmzet).clamp(0.0, 1.0);
+                          
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12.0),
+                            child: Row(
+                              children: [
+                                SizedBox(width: 60, child: Text(day['hari'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold))),
+                                Expanded(
+                                  child: Stack(
+                                    children: [
+                                      Container(height: 12, decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(6))),
+                                      FractionallySizedBox(widthFactor: percent, child: Container(height: 12, decoration: BoxDecoration(color: const Color(0xFF5D4037), borderRadius: BorderRadius.circular(6)))),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 12),
-                              Text(currencyFormatter.format(omzet), style: const TextStyle(fontSize: 12)),
-                            ],
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  )
+                                const SizedBox(width: 12),
+                                Text(currencyFormatter.format(omzet), style: const TextStyle(fontSize: 12)),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    )
+                  ] else ...[
+                     const SizedBox(height: 24),
+                     const Center(child: Text("Data tren harian belum tersedia"))
+                  ]
                 ],
               )
           ],

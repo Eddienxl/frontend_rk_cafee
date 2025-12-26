@@ -164,7 +164,7 @@ class OwnerService {
 
   // ================= BAHAN BAKU =================
   Future<List<Map<String, dynamic>>> getBahanBaku() async {
-    final url = Uri.parse('${ApiConfig.baseUrl}/bahan-baku');
+    final url = Uri.parse('${ApiConfig.baseUrl}/bahan');
     final response = await http.get(url, headers: await _headers());
 
     if (response.statusCode == 200) {
