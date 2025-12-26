@@ -20,16 +20,17 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
   }
 
   Future<void> _fetchBahanBaku() async {
+    setState(() => _isLoading = true);
     try {
       final data = await _ownerService.getBahanBaku();
       if (mounted) {
         setState(() {
-          // Mapping data backend ke UI model sederhana
           _bahanBaku = data.map((item) => {
+            'id': item['id_bahan'],
             'nama': item['nama_bahan'],
             'stok': (item['sisa_stok'] ?? 0), 
             'satuan': item['satuan'],
-            'min': 5, // Default min stok (belum ada di BE)
+            'min': (item['stok_minimum'] ?? 5),
           }).toList();
           _isLoading = false;
         });
@@ -37,6 +38,128 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
     } catch (e) {
       if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  // --- CREATE ---
+  void _showAddDialog() {
+    final namaCtrl = TextEditingController();
+    final stokCtrl = TextEditingController();
+    final minCtrl = TextEditingController();
+    String satuan = 'gram'; // Default
+    final satuanOptions = ['gram', 'ml', 'pcs', 'kg', 'liter', 'botol'];
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Tambah Bahan Baku"),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(controller: namaCtrl, decoration: const InputDecoration(labelText: "Nama Bahan")),
+              TextField(controller: stokCtrl, decoration: const InputDecoration(labelText: "Stok Awal"), keyboardType: TextInputType.number),
+              TextField(controller: minCtrl, decoration: const InputDecoration(labelText: "Stok Minimum"), keyboardType: TextInputType.number),
+              DropdownButtonFormField<String>(
+                value: satuan,
+                items: satuanOptions.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                onChanged: (v) => satuan = v!,
+                decoration: const InputDecoration(labelText: "Satuan Dasar"),
+              )
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Batal")),
+          ElevatedButton(
+            onPressed: () async {
+              if (namaCtrl.text.isEmpty || stokCtrl.text.isEmpty) return;
+              Navigator.pop(context);
+              
+              final success = await _ownerService.createBahan(
+                nama: namaCtrl.text, 
+                stok: double.tryParse(stokCtrl.text) ?? 0, 
+                satuan: satuan, 
+                min: double.tryParse(minCtrl.text) ?? 5
+              );
+              
+              if (success) _fetchBahanBaku();
+              else if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Gagal menambah bahan")));
+            },
+            child: const Text("Simpan"),
+          )
+        ],
+      ),
+    );
+  }
+
+  // --- UPDATE (RESTOCK) ---
+  void _showRestockDialog(Map<String, dynamic> item) {
+    final jumlahCtrl = TextEditingController();
+    String satuan = item['satuan']; 
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Update Stok: ${item['nama']}"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: jumlahCtrl, 
+              decoration: const InputDecoration(labelText: "Jumlah Tambah/Kurang (+/-)"), 
+              keyboardType: const TextInputType.numberWithOptions(signed: true)
+            ),
+            const SizedBox(height: 10),
+            Text("Satuan: $satuan (Otomatis)", style: const TextStyle(color: Colors.grey)),
+            // Nanti bisa dikembangkan agar user bisa pilih satuan input beda (konversi backend)
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Batal")),
+          ElevatedButton(
+            onPressed: () async {
+              if (jumlahCtrl.text.isEmpty) return;
+              Navigator.pop(context);
+
+              final success = await _ownerService.updateBahanStok(
+                id: item['id'],
+                jumlah: double.tryParse(jumlahCtrl.text) ?? 0,
+                satuanInput: satuan,
+                keterangan: "Restock via Owner App"
+              );
+
+              if (success) _fetchBahanBaku();
+              else if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Gagal update stok")));
+            },
+            child: const Text("Update"),
+          )
+        ],
+      ),
+    );
+  }
+
+  // --- DELETE ---
+  void _deleteBahan(Map<String, dynamic> item) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Hapus Bahan"),
+        content: Text("Yakin hapus ${item['nama']}?"),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Batal")),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () async {
+              Navigator.pop(context);
+              final success = await _ownerService.deleteBahan(item['id']);
+              if (success) _fetchBahanBaku();
+              else if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Gagal hapus bahan")));
+            },
+            child: const Text("Hapus"),
+          )
+        ],
+      ),
+    );
   }
 
   @override
@@ -57,7 +180,7 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Header Stats
+            // Header Stats (Keep existing logic)
             Row(
               children: [
                 Expanded(
@@ -68,7 +191,7 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
                       child: Column(
                         children: [
                           const Text("Stok Menipis", style: TextStyle(color: Colors.red)),
-                          Text("${_bahanBaku.where((b) => b['stok'] < b['min']).length} Item", 
+                          Text("${_bahanBaku.where((b) => (b['stok'] as num) < (b['min'] as num)).length} Item", 
                             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.red)),
                         ],
                       ),
@@ -123,12 +246,36 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
                             color: isLow ? Colors.red : Colors.black
                           )
                         ),
-                        // const SizedBox(width: 8),
-                        // IconButton(icon: const Icon(Icons.edit_square), onPressed: () {}),
+                        const SizedBox(width: 12),
+                        IconButton(
+                          icon: const Icon(Icons.add_circle_outline, color: Colors.green), 
+                          onPressed: () => _showRestockDialog(item),
+                          tooltip: "Restock",
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete_outline, color: Colors.red), 
+                          onPressed: () => _deleteBahan(item),
+                          tooltip: "Hapus",
+                        ),
                       ],
                     ),
                   );
                 },
+              ),
+            ),
+            
+            // Add Button (Re-added)
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.add),
+                label: const Text("Tambah Bahan Baku"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF5D4037),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                onPressed: _showAddDialog,
               ),
             ),
           ],

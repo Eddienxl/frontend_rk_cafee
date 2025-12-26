@@ -176,4 +176,52 @@ class OwnerService {
     }
     return [];
   }
+
+  Future<bool> createBahan({
+    required String nama,
+    required double stok,
+    required String satuan,
+    required double min,
+    String? id,
+  }) async {
+    final url = Uri.parse('${ApiConfig.baseUrl}/bahan');
+    final response = await http.post(
+      url,
+      headers: await _headers(),
+      body: jsonEncode({
+        'id_bahan': id ?? 'BB-${DateTime.now().millisecondsSinceEpoch}',
+        'nama_bahan': nama,
+        'stok_saat_ini': stok,
+        'stok_minimum': min,
+        'satuan': satuan,
+        'satuan_input': satuan, // Asumsi input awal sama dengan satuan dasar
+      }),
+    );
+    return response.statusCode == 200 || response.statusCode == 201;
+  }
+
+  Future<bool> updateBahanStok({
+    required String id,
+    required double jumlah, // Bisa positif (tambah) atau negatif (kurang)
+    required String satuanInput,
+    String keterangan = 'Update Manual',
+  }) async {
+    final url = Uri.parse('${ApiConfig.baseUrl}/bahan/$id');
+    final response = await http.put(
+      url,
+      headers: await _headers(),
+      body: jsonEncode({
+        'jumlah': jumlah,
+        'satuan_input': satuanInput,
+        'keterangan': keterangan,
+      }),
+    );
+    return response.statusCode == 200;
+  }
+  
+  Future<bool> deleteBahan(String id) async {
+    final url = Uri.parse('${ApiConfig.baseUrl}/bahan/$id');
+    final response = await http.delete(url, headers: await _headers());
+    return response.statusCode == 200;
+  }
 }
