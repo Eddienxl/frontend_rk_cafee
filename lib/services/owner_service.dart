@@ -1,196 +1,164 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../config/api_config.dart';
 import '../models/user_model.dart';
 import '../models/menu_model.dart';
 
 class OwnerService {
-  // ================= DUMMY DATA STORE =================
   
-  // 1. DATA USER
-  final List<UserModel> _dummyUsers = [
-    UserModel(id: '1', username: 'owner_asep', role: 'OWNER'),
-    UserModel(id: '2', username: 'admin_winda', role: 'ADMIN'),
-    UserModel(id: '3', username: 'kasir_budi', role: 'KASIR'),
-    UserModel(id: '4', username: 'kasir_siti', role: 'KASIR'),
-    UserModel(id: '5', username: 'barista_joni', role: 'BARISTA'),
-    UserModel(id: '6', username: 'dapur_maman', role: 'DAPUR'),
-  ];
-
-  // 2. DATA MENU
-  final List<MenuModel> _dummyMenus = [
-    // Minuman
-    MenuModel(id: '1', nama: 'Espresso', harga: 15000, kategori: 'MINUMAN', imageUrl: '', isAvailable: true),
-    MenuModel(id: '2', nama: 'Americano', harga: 18000, kategori: 'MINUMAN', imageUrl: '', isAvailable: true),
-    MenuModel(id: '3', nama: 'Kopi Susu Gula Aren', harga: 22000, kategori: 'MINUMAN', imageUrl: '', isAvailable: true),
-    MenuModel(id: '4', nama: 'Cappuccino', harga: 24000, kategori: 'MINUMAN', imageUrl: '', isAvailable: true),
-    MenuModel(id: '5', nama: 'Red Velvet Latte', harga: 26000, kategori: 'MINUMAN', imageUrl: '', isAvailable: false),
-    MenuModel(id: '6', nama: 'Es Teh Manis', harga: 8000, kategori: 'MINUMAN', imageUrl: '', isAvailable: true),
-    
-    // Makanan
-    MenuModel(id: '11', nama: 'Nasi Goreng Spesial', harga: 28000, kategori: 'MAKANAN', imageUrl: '', isAvailable: true),
-    MenuModel(id: '12', nama: 'Mie Goreng Seafood', harga: 30000, kategori: 'MAKANAN', imageUrl: '', isAvailable: true),
-    MenuModel(id: '13', nama: 'Rice Bowl Teriyaki', harga: 32000, kategori: 'MAKANAN', imageUrl: '', isAvailable: true),
-    
-    // Snack
-    MenuModel(id: '21', nama: 'Kentang Goreng', harga: 15000, kategori: 'SNACK', imageUrl: '', isAvailable: true),
-    MenuModel(id: '22', nama: 'Pisang Bakar Keju', harga: 18000, kategori: 'SNACK', imageUrl: '', isAvailable: true),
-    MenuModel(id: '23', nama: 'Cireng Rujak', harga: 12000, kategori: 'SNACK', imageUrl: '', isAvailable: true),
-  ];
-
-  // 3. DATA BOM / RESEP
-  // Struktur: ID Menu -> List Bahan
-  final List<Map<String, dynamic>> _dummyBOM = [
-    {
-      'id_menu': '1', // Espresso
-      'nama_menu': 'Espresso',
-      'resep': [
-        {'nama_bahan': 'Biji Kopi Arabica', 'jumlah': 18, 'satuan': 'gram'},
-        {'nama_bahan': 'Air Mineral', 'jumlah': 30, 'satuan': 'ml'},
-      ]
-    },
-    {
-      'id_menu': '3', // Kopi Susu Gula Aren
-      'nama_menu': 'Kopi Susu Gula Aren',
-      'resep': [
-        {'nama_bahan': 'Espresso Shot', 'jumlah': 1, 'satuan': 'shot'},
-        {'nama_bahan': 'Susu UHT', 'jumlah': 150, 'satuan': 'ml'},
-        {'nama_bahan': 'Gula Aren Cair', 'jumlah': 30, 'satuan': 'ml'},
-        {'nama_bahan': 'Es Batu', 'jumlah': 100, 'satuan': 'gram'},
-      ]
-    },
-    {
-      'id_menu': '11', // Nasi Goreng
-      'nama_menu': 'Nasi Goreng Spesial',
-      'resep': [
-        {'nama_bahan': 'Nasi Putih', 'jumlah': 200, 'satuan': 'gram'},
-        {'nama_bahan': 'Telur Ayam', 'jumlah': 1, 'satuan': 'butir'},
-        {'nama_bahan': 'Bumbu Nasi Goreng', 'jumlah': 1, 'satuan': 'sdm'},
-        {'nama_bahan': 'Minyak Goreng', 'jumlah': 10, 'satuan': 'ml'},
-        {'nama_bahan': 'Ayam Suwir', 'jumlah': 30, 'satuan': 'gram'},
-      ]
-    },
-    {
-      'id_menu': '21', // Kentang Goreng
-      'nama_menu': 'Kentang Goreng',
-      'resep': [
-        {'nama_bahan': 'Kentang Frozen', 'jumlah': 150, 'satuan': 'gram'},
-        {'nama_bahan': 'Garam / Bumbu Tabur', 'jumlah': 2, 'satuan': 'gram'},
-        {'nama_bahan': 'Minyak Goreng', 'jumlah': 200, 'satuan': 'ml'}, // utk deep fry (estimasi serap)
-      ]
-    },
-  ];
-
-  // ================= METHODS =================
-
-  // --- USER ---
-  Future<List<UserModel>> getUsers() async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    return _dummyUsers;
+  // Helper: Get Token
+  Future<String?> _getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('token');
   }
 
-  Future<bool> createUser(String username, String password, String role) async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    _dummyUsers.add(UserModel(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      username: username,
-      role: role
-    ));
-    return true;
-  }
-
-  Future<bool> updateUser(String id, String? password, String? role) async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    final index = _dummyUsers.indexWhere((u) => u.id == id);
-    if (index != -1) {
-      final old = _dummyUsers[index];
-      _dummyUsers[index] = UserModel(
-        id: old.id,
-        username: old.username,
-        role: role ?? old.role,
-        token: old.token
-      );
-      return true;
-    }
-    return false;
-  }
-
-  Future<bool> deleteUser(String id) async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    _dummyUsers.removeWhere((u) => u.id == id);
-    return true;
-  }
-
-  // --- MENU ---
-  Future<List<MenuModel>> getMenus() async {
-     await Future.delayed(const Duration(milliseconds: 500));
-     return _dummyMenus;
-  }
-  
-  Future<bool> createMenu(String nama, int harga, String kategori) async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    _dummyMenus.add(MenuModel(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      nama: nama,
-      harga: harga,
-      kategori: kategori,
-      isAvailable: true
-    ));
-    return true;
-  }
-
-  Future<bool> updateMenu(String id, String nama, int harga, String kategori) async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    final index = _dummyMenus.indexWhere((m) => m.id == id);
-    if (index != -1) {
-      final old = _dummyMenus[index];
-      _dummyMenus[index] = MenuModel(
-        id: old.id,
-        nama: nama,
-        harga: harga,
-        kategori: kategori,
-        imageUrl: old.imageUrl,
-        isAvailable: old.isAvailable
-      );
-      return true;
-    }
-    return false;
-  }
-
-  Future<bool> deleteMenu(String idMenu) async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    _dummyMenus.removeWhere((m) => m.id == idMenu);
-    return true;
-  }
-
-  // --- REPORT ---
-  Future<Map<String, dynamic>> getLaporanPenjualan({String? startDate, String? endDate}) async {
-    await Future.delayed(const Duration(milliseconds: 800));
-    // Data Statistik Dummy yang lebih detail
+  // Helper: Headers
+  Future<Map<String, String>> _headers() async {
+    final token = await _getToken();
     return {
-      'total_omzet': 12500000,
-      'total_order': 450,
-      'total_profit_bersih': 8200000, 
-      'menu_terlaris': [
-        {'nama_menu': 'Kopi Susu Gula Aren', 'total_terjual': 120},
-        {'nama_menu': 'Nasi Goreng Spesial', 'total_terjual': 85},
-        {'nama_menu': 'Kentang Goreng', 'total_terjual': 60},
-        {'nama_menu': 'Espresso', 'total_terjual': 55},
-        {'nama_menu': 'Mie Goreng Seafood', 'total_terjual': 40},
-      ],
-      'statistik_harian': [
-        {'hari': 'Senin', 'omzet': 1500000},
-        {'hari': 'Selasa', 'omzet': 1200000},
-        {'hari': 'Rabu', 'omzet': 1800000},
-        {'hari': 'Kamis', 'omzet': 1600000},
-        {'hari': 'Jumat', 'omzet': 2500000},
-        {'hari': 'Sabtu', 'omzet': 3200000}, // Weekend rame
-        {'hari': 'Minggu', 'omzet': 2800000},
-      ]
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
     };
   }
 
-  // --- BOM / RESEP ---
-  // Returns List of Object {id_menu, nama_menu, resep: List}
+  // ================= USERS =================
+  Future<List<UserModel>> getUsers() async {
+    final url = Uri.parse('${ApiConfig.baseUrl}/users');
+    final response = await http.get(url, headers: await _headers());
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      if (json['success'] == true) {
+        final List data = json['data'];
+        return data.map((e) => UserModel.fromJson(e)).toList();
+      }
+    }
+    return [];
+  }
+
+  Future<bool> createUser(String username, String password, String role) async {
+    final url = Uri.parse('${ApiConfig.baseUrl}/users');
+    final response = await http.post(
+      url,
+      headers: await _headers(),
+      body: jsonEncode({
+        'id_user': DateTime.now().millisecondsSinceEpoch, // Backend need ID? Check Controller. Yes, it takes id_user from body.
+        'username': username,
+        'password': password,
+        'role': role
+      }),
+    );
+
+    return response.statusCode == 200 || response.statusCode == 201;
+  }
+
+  Future<bool> updateUser(String id, String? password, String? role) async {
+    final url = Uri.parse('${ApiConfig.baseUrl}/users/$id');
+    final body = <String, dynamic>{};
+    if (password != null && password.isNotEmpty) body['password'] = password;
+    if (role != null) body['role'] = role;
+
+    final response = await http.put(
+      url, 
+      headers: await _headers(),
+      body: jsonEncode(body)
+    );
+
+    return response.statusCode == 200;
+  }
+
+  Future<bool> deleteUser(String id) async {
+    final url = Uri.parse('${ApiConfig.baseUrl}/users/$id');
+    final response = await http.delete(url, headers: await _headers());
+    return response.statusCode == 200;
+  }
+
+  // ================= MENUS =================
+  Future<List<MenuModel>> getMenus() async {
+    final url = Uri.parse('${ApiConfig.baseUrl}/menus');
+    // Public endpoint sometimes? Or Protected? Route says: get /menus is public (no verifyToken).
+    // But good practice to send headers if we have them.
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      if (json['success'] == true) {
+        final List data = json['data'];
+        return data.map((e) => MenuModel.fromJson(e)).toList();
+      }
+    }
+    return [];
+  }
+
+  Future<bool> createMenu(String nama, int harga, String kategori) async {
+    final url = Uri.parse('${ApiConfig.baseUrl}/menus');
+    final response = await http.post(
+      url,
+      headers: await _headers(),
+      body: jsonEncode({
+        'id_menu': DateTime.now().millisecondsSinceEpoch.toString(), // Backend expects String/Int ID? DB is usually AutoInc or Provided. Controller takes id_menu.
+        'nama_menu': nama,
+        'harga': harga,
+        'kategori': kategori,
+        'status_tersedia': true 
+      }),
+    );
+    return response.statusCode == 200 || response.statusCode == 201;
+  }
+
+  Future<bool> updateMenu(String id, String nama, int harga, String kategori) async {
+    final url = Uri.parse('${ApiConfig.baseUrl}/menus/$id');
+    final response = await http.put(
+      url,
+      headers: await _headers(),
+      body: jsonEncode({
+        'nama_menu': nama,
+        'harga': harga,
+        'kategori': kategori,
+        // 'status_tersedia': true // Keep existing status logic if needed
+      }),
+    );
+    return response.statusCode == 200;
+  }
+
+  Future<bool> deleteMenu(String id) async {
+    final url = Uri.parse('${ApiConfig.baseUrl}/menus/$id');
+    final response = await http.delete(url, headers: await _headers());
+    return response.statusCode == 200;
+  }
+
+  // ================= LAPORAN =================
+  Future<Map<String, dynamic>> getLaporanPenjualan({String? startDate, String? endDate}) async {
+    // Default date: This Month
+    final now = DateTime.now();
+    final start = startDate ?? DateFormat('yyyy-MM-dd').format(DateTime(now.year, now.month, 1));
+    final end = endDate ?? DateFormat('yyyy-MM-dd').format(now);
+
+    final url = Uri.parse('${ApiConfig.baseUrl}/laporan/penjualan?startDate=$start&endDate=$end');
+    final response = await http.get(url, headers: await _headers());
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      // Backend returns directly the object structure { periode, total_order, ... }
+      return json;
+    }
+    return {};
+  }
+
+  // ================= BOM / RESEP =================
   Future<List<Map<String, dynamic>>> getBOM() async {
-    await Future.delayed(const Duration(milliseconds: 600));
-    return _dummyBOM;
+    final url = Uri.parse('${ApiConfig.baseUrl}/bom');
+    final response = await http.get(url, headers: await _headers());
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      if (json['success'] == true) {
+        // Backend returns: data: [ { id_menu, nama_menu, resep: [...] }, ... ]
+        return List<Map<String, dynamic>>.from(json['data']);
+      }
+    }
+    return [];
   }
 }
