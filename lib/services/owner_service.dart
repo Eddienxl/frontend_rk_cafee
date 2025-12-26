@@ -162,6 +162,32 @@ class OwnerService {
     return [];
   }
 
+  Future<bool> createBOM(String idMenu, String idBahan, double jumlah) async {
+    final url = Uri.parse('${ApiConfig.baseUrl}/bom'); // POST /bom creates strict BOM structure
+    // Backend expects: { id_menu: "...", bahan: [ { id_bahan: "...", jumlah_dibutuhkan: 10 } ] }
+    
+    final response = await http.post(
+      url,
+      headers: await _headers(),
+      body: jsonEncode({
+        'id_menu': idMenu,
+        'bahan': [
+          {
+            'id_bahan': idBahan,
+            'jumlah_dibutuhkan': jumlah
+          }
+        ]
+      }),
+    );
+    return response.statusCode == 200 || response.statusCode == 201;
+  }
+
+  Future<bool> deleteBOM(String idBom) async {
+    final url = Uri.parse('${ApiConfig.baseUrl}/bom/$idBom');
+    final response = await http.delete(url, headers: await _headers());
+    return response.statusCode == 200;
+  }
+
   // ================= BAHAN BAKU =================
   Future<List<Map<String, dynamic>>> getBahanBaku() async {
     final url = Uri.parse('${ApiConfig.baseUrl}/bahan');
