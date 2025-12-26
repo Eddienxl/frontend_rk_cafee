@@ -268,7 +268,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
              UserAccountsDrawerHeader(
               decoration: const BoxDecoration(
                 color: Color(0xFF5D4037),
-                image: DecorationImage(image: NetworkImage("https://source.unsplash.com/random/800x600/?coffee"), fit: BoxFit.cover, opacity: 0.3)
+                image: DecorationImage(image: NetworkImage("https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=800&q=80"), fit: BoxFit.cover, opacity: 0.3)
               ),
               accountName: Text(_username, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
               accountEmail: const Text("Owner Access"), 
