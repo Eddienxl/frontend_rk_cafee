@@ -28,7 +28,7 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
           _bahanBaku = data.map((item) => {
             'id': item['id_bahan'],
             'nama': item['nama_bahan'],
-            'stok': (item['sisa_stok'] ?? 0), 
+            'stok': (item['stok_saat_ini'] ?? 0), 
             'satuan': item['satuan'],
             'min': (item['stok_minimum'] ?? 5),
           }).toList();
@@ -172,115 +172,121 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
         elevation: 0,
         centerTitle: true,
       ),
-      body: _isLoading 
+      body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : _bahanBaku.isEmpty 
-              ? const Center(child: Text("Belum ada data bahan baku"))
-              : Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // Header Stats (Keep existing logic)
-            Row(
+          : Column(
               children: [
-                Expanded(
-                  child: Card(
-                    color: Colors.red[50],
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          const Text("Stok Menipis", style: TextStyle(color: Colors.red)),
-                          Text("${_bahanBaku.where((b) => (b['stok'] as num) < (b['min'] as num)).length} Item", 
-                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.red)),
-                        ],
-                      ),
+                // 1. Stats Header (Visible only if valid data exists, optional)
+                if (_bahanBaku.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Card(
+                            color: Colors.red[50],
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                children: [
+                                  const Text("Stok Menipis", style: TextStyle(color: Colors.red)),
+                                  Text(
+                                    "${_bahanBaku.where((b) => (b['stok'] as num) < (b['min'] as num)).length} Item",
+                                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.red),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Card(
+                            color: Colors.green[50],
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                children: [
+                                  const Text("Total Item", style: TextStyle(color: Colors.green)),
+                                  Text(
+                                    "${_bahanBaku.length} Item",
+                                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.green),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-                const SizedBox(width: 16),
+
+                // 2. Content Area (List or Empty State)
                 Expanded(
-                  child: Card(
-                    color: Colors.green[50],
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          const Text("Total Item", style: TextStyle(color: Colors.green)),
-                          Text("${_bahanBaku.length} Item", 
-                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.green)),
-                        ],
-                      ),
+                  child: _bahanBaku.isEmpty
+                      ? const Center(child: Text("Belum ada data bahan baku"))
+                      : ListView.separated(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          itemCount: _bahanBaku.length,
+                          separatorBuilder: (context, index) => const Divider(),
+                          itemBuilder: (context, index) {
+                            final item = _bahanBaku[index];
+                            final stok = (item['stok'] is num) ? item['stok'] : double.tryParse(item['stok'].toString()) ?? 0;
+                            final min = (item['min'] is num) ? item['min'] : double.tryParse(item['min'].toString()) ?? 0;
+                            final isLow = stok < min;
+
+                            return ListTile(
+                              leading: CircleAvatar(
+                                backgroundColor: isLow ? Colors.red[100] : Colors.blue[100],
+                                child: Icon(Icons.inventory_2, color: isLow ? Colors.red : Colors.blue),
+                              ),
+                              title: Text(item['nama'], style: const TextStyle(fontWeight: FontWeight.bold)),
+                              subtitle: Text("Min: $min ${item['satuan']}"),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text("$stok ${item['satuan']}",
+                                      style: TextStyle(
+                                          fontSize: 16, fontWeight: FontWeight.bold, color: isLow ? Colors.red : Colors.black)),
+                                  const SizedBox(width: 12),
+                                  IconButton(
+                                    icon: const Icon(Icons.add_circle_outline, color: Colors.green),
+                                    onPressed: () => _showRestockDialog(item),
+                                    tooltip: "Restock",
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete_outline, color: Colors.red),
+                                    onPressed: () => _deleteBahan(item),
+                                    tooltip: "Hapus",
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                ),
+
+                // 3. Bottom Action Button (Always Visible)
+                Container(
+                  padding: const EdgeInsets.all(16.0),
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [BoxShadow(blurRadius: 5, color: Colors.black.withOpacity(0.1), offset: const Offset(0, -2))]
+                  ),
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.add),
+                    label: const Text("Tambah Bahan Baku"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF5D4037),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
+                    onPressed: _showAddDialog,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            
-            // List Bahan Baku
-            Expanded(
-              child: ListView.separated(
-                itemCount: _bahanBaku.length,
-                separatorBuilder: (context, index) => const Divider(),
-                itemBuilder: (context, index) {
-                  final item = _bahanBaku[index];
-                  final stok = (item['stok'] is num) ? item['stok'] : double.tryParse(item['stok'].toString()) ?? 0;
-                  final min = (item['min'] is num) ? item['min'] : double.tryParse(item['min'].toString()) ?? 0;
-                  final isLow = stok < min;
-
-                  return ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: isLow ? Colors.red[100] : Colors.blue[100],
-                      child: Icon(Icons.inventory_2, color: isLow ? Colors.red : Colors.blue),
-                    ),
-                    title: Text(item['nama'], style: const TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Text("Min: $min ${item['satuan']}"),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text("$stok ${item['satuan']}", 
-                          style: TextStyle(
-                            fontSize: 16, 
-                            fontWeight: FontWeight.bold, 
-                            color: isLow ? Colors.red : Colors.black
-                          )
-                        ),
-                        const SizedBox(width: 12),
-                        IconButton(
-                          icon: const Icon(Icons.add_circle_outline, color: Colors.green), 
-                          onPressed: () => _showRestockDialog(item),
-                          tooltip: "Restock",
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.delete_outline, color: Colors.red), 
-                          onPressed: () => _deleteBahan(item),
-                          tooltip: "Hapus",
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-            
-            // Add Button (Re-added)
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                icon: const Icon(Icons.add),
-                label: const Text("Tambah Bahan Baku"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF5D4037),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                onPressed: _showAddDialog,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
