@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../services/user_service.dart';
 import '../../models/user_model.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 class UserManagementScreen extends StatefulWidget {
   const UserManagementScreen({super.key});
 
@@ -31,7 +33,6 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
-        // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e'))); // Service already prints error
       }
     }
   }
@@ -45,51 +46,43 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(user == null ? 'Tambah User' : 'Edit User'),
+        title: Text(user == null ? 'Tambah User' : 'Edit User', style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (user == null) // Username tidak boleh edit?
+            if (user == null)
               TextField(
                 controller: usernameController,
-                decoration: const InputDecoration(labelText: 'Username'),
+                decoration: const InputDecoration(labelText: 'Username', border: OutlineInputBorder()),
               ),
+            const SizedBox(height: 16),
             TextField(
               controller: passwordController,
-              decoration: const InputDecoration(labelText: 'Password (Kosongkan jika tetap)'),
+              decoration: const InputDecoration(labelText: 'Password (Kosongkan jika tetap)', border: OutlineInputBorder()),
               obscureText: true,
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              initialValue: selectedRole,
+              value: selectedRole,
               items: roles.map((r) => DropdownMenuItem(value: r, child: Text(r))).toList(),
               onChanged: (val) => selectedRole = val!,
-              decoration: const InputDecoration(labelText: 'Role'),
+              decoration: const InputDecoration(labelText: 'Role', border: OutlineInputBorder()),
             ),
           ],
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Batal')),
           ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF5D4037), foregroundColor: Colors.white),
             onPressed: () async {
               Navigator.pop(context);
               setState(() => _isLoading = true);
               
               bool success;
               if (user == null) {
-                // Add
-                success = await _userService.createUser(
-                  usernameController.text, 
-                  passwordController.text, 
-                  selectedRole
-                );
+                success = await _userService.createUser(usernameController.text, passwordController.text, selectedRole);
               } else {
-                // Edit
-                success = await _userService.updateUser(
-                  user.idUser, 
-                  passwordController.text.isEmpty ? null : passwordController.text, 
-                  selectedRole
-                );
+                success = await _userService.updateUser(user.idUser, passwordController.text.isEmpty ? null : passwordController.text, selectedRole);
               }
 
               if (success) {
@@ -98,7 +91,6 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                 if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Gagal simpan')));
                 setState(() => _isLoading = false);
               }
-              
             },
             child: const Text('Simpan'),
           ),
@@ -116,7 +108,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Batal')),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
             onPressed: () async {
               Navigator.pop(context);
               setState(() => _isLoading = true);
@@ -129,7 +121,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
               }
             },
             child: const Text('Hapus'),
-          ),
+          )
         ],
       ),
     );
@@ -138,29 +130,49 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Manajemen User (Karyawan)')),
+      backgroundColor: const Color(0xFFFBF8F6),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : ListView.builder(
+              padding: const EdgeInsets.all(16),
               itemCount: _users.length,
               itemBuilder: (context, index) {
                 final user = _users[index];
-                return ListTile(
-                  leading: CircleAvatar(child: Text(user.role.isNotEmpty ? user.role[0] : '?')),
-                  title: Text(user.username),
-                  subtitle: Text(user.role),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(icon: const Icon(Icons.edit), onPressed: () => _showAddEditDialog(user: user)),
-                      IconButton(icon: const Icon(Icons.delete, color: Colors.red), onPressed: () => _deleteUser(user)),
-                    ],
+                return Card(
+                  elevation: 2,
+                  margin: const EdgeInsets.only(bottom: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    leading: CircleAvatar(
+                      backgroundColor: const Color(0xFF5D4037).withOpacity(0.1),
+                      child: Text(user.role.isNotEmpty ? user.role[0] : '?', style: const TextStyle(color: Color(0xFF5D4037), fontWeight: FontWeight.bold)),
+                    ),
+                    title: Text(user.username, style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16)),
+                    subtitle: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      margin: const EdgeInsets.only(top: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(user.role, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(icon: const Icon(Icons.edit_note, color: Colors.blue), onPressed: () => _showAddEditDialog(user: user)),
+                        IconButton(icon: const Icon(Icons.delete_outline, color: Colors.red), onPressed: () => _deleteUser(user)),
+                      ],
+                    ),
                   ),
                 );
               },
             ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: const Color(0xFF5D4037),
+        label: const Text("Tambah User", style: TextStyle(color: Colors.white)),
+        icon: const Icon(Icons.person_add, color: Colors.white),
         onPressed: () => _showAddEditDialog(),
       ),
     );

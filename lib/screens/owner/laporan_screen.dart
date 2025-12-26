@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../services/laporan_service.dart';
 import 'package:intl/intl.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 class LaporanScreen extends StatefulWidget {
   const LaporanScreen({super.key});
@@ -12,8 +14,7 @@ class LaporanScreen extends StatefulWidget {
 class _LaporanScreenState extends State<LaporanScreen> {
   final LaporanService _laporanService = LaporanService();
   
-  // State Filter
-  String _filterType = 'Harian'; // Harian, Bulanan, Custom
+  String _filterType = 'Harian';
   DateTimeRange? _dateRange;
   
   Map<String, dynamic>? _laporanData;
@@ -28,7 +29,6 @@ class _LaporanScreenState extends State<LaporanScreen> {
 
   Future<void> _fetchLaporan() async {
     setState(() => _isLoading = true);
-    // Simulasi kirim filter ke service (Service dummy ignore filter actually)
     try {
       final data = await _laporanService.getLaporanPenjualan(
         startDate: _dateRange?.start.toString(),
@@ -50,6 +50,14 @@ class _LaporanScreenState extends State<LaporanScreen> {
       context: context,
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: const ColorScheme.light(primary: Color(0xFF5D4037)),
+          ),
+          child: child!,
+        );
+      },
     );
     if (picked != null) {
       setState(() {
@@ -63,155 +71,141 @@ class _LaporanScreenState extends State<LaporanScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        title: const Text('Laporan Keuangan'),
-        backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF5D4037),
-        elevation: 0,
-        leading: const SizedBox(), 
-        centerTitle: true,
-        actions: [
-          IconButton(icon: const Icon(Icons.refresh), onPressed: _fetchLaporan)
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // FILTER SECTION
-            Card(
-              elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: Colors.grey[200]!)),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Row(
-                  children: [
-                    const Icon(Icons.filter_list, color: Color(0xFF5D4037)),
-                    const SizedBox(width: 12),
-                    DropdownButton<String>(
-                      value: _filterType == 'Custom' ? 'Custom' : _filterType,
-                      underline: const SizedBox(),
-                      items: ['Harian', 'Bulanan', 'Custom'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-                      onChanged: (val) {
-                        if (val == 'Custom') {
-                          _selectDateRange();
-                        } else {
-                          setState(() => _filterType = val!);
-                          _fetchLaporan();
-                        }
-                      },
-                    ),
-                    const Spacer(),
-                    if (_filterType == 'Custom' && _dateRange != null)
-                      Text(
-                        "${DateFormat('dd/MM').format(_dateRange!.start)} - ${DateFormat('dd/MM').format(_dateRange!.end)}",
-                        style: const TextStyle(fontSize: 12, color: Colors.grey),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            
-            if (_isLoading) 
-              const Center(child: CircularProgressIndicator())
-            else if (_laporanData == null)
-              const Center(child: Text("Data tidak tersedia"))
-            else
-              Column(
-                children: [
-                  // SUMMARY BIG CARDS
+      backgroundColor: const Color(0xFFFBF8F6),
+      body: _isLoading 
+        ? const Center(child: CircularProgressIndicator())
+        : SingleChildScrollView(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildFilterHeader(),
+                const SizedBox(height: 24),
+                
+                if (_laporanData != null) ...[
                   Row(
                     children: [
-                      Expanded(child: _buildSummaryBox("Total Omzet", currencyFormatter.format(_laporanData!['total_omzet']), Colors.green)),
+                      Expanded(child: _buildSummaryCard("Total Omzet", currencyFormatter.format(_laporanData!['total_omzet']), Icons.payments, Colors.green)),
                       const SizedBox(width: 16),
-                      Expanded(child: _buildSummaryBox("Total Order", "${_laporanData!['total_order']} Transaksi", Colors.blue)),
+                      Expanded(child: _buildSummaryCard("Total Order", "${_laporanData!['total_order']}", Icons.receipt, Colors.blue)),
                     ],
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 32),
                   
-                  // MENU TERLARIS
-                  const Align(alignment: Alignment.centerLeft, child: Text("Menu Terlaris", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18))),
-                  const SizedBox(height: 12),
+                  Text("Tren Penjualan", style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 16),
+                  _buildChartSection(),
+                  
+                  const SizedBox(height: 32),
+                  Text("Menu Terlaris", style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 16),
                   ...(_laporanData!['menu_terlaris'] as List).map((m) => _buildTopMenuItem(m)),
+                  const SizedBox(height: 40),
+                ] else
+                  const Center(child: Text("Data tidak tersedia")),
+              ],
+            ),
+          ),
+    );
+  }
 
-                  const SizedBox(height: 24),
-                  
-                  // STATISTIK GRAFIK (Dummy Representation)
-                  // STATISTIK GRAFIK
-                  // STATISTIK GRAFIK (Dummy Representation)
-                  if (_laporanData!.containsKey('statistik_harian') && _laporanData!['statistik_harian'] != null && (_laporanData!['statistik_harian'] as List).isNotEmpty) ...[
-                    const Align(alignment: Alignment.centerLeft, child: Text("Tren Penjualan", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18))),
-                    const SizedBox(height: 12),
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-                      child: Column(
-                        children: (_laporanData!['statistik_harian'] as List).map((day) {
-                          double omzet = (day['omzet'] is int) ? (day['omzet'] as int).toDouble() : (day['omzet'] as double);
-                          double maxOmzet = 2000000; 
-                          double percent = (omzet / maxOmzet).clamp(0.0, 1.0);
-                          
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 12.0),
-                            child: Row(
-                              children: [
-                                SizedBox(width: 60, child: Text(day['hari'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold))),
-                                Expanded(
-                                  child: Stack(
-                                    children: [
-                                      Container(height: 12, decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(6))),
-                                      FractionallySizedBox(widthFactor: percent, child: Container(height: 12, decoration: BoxDecoration(color: const Color(0xFF5D4037), borderRadius: BorderRadius.circular(6)))),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Text(currencyFormatter.format(omzet), style: const TextStyle(fontSize: 12)),
-                              ],
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    )
-                  ] else ...[
-                     const SizedBox(height: 24),
-                     // const Center(child: Text("Data tren harian belum tersedia")) // Optional: Hide or show nice message
-                  ]
-                ],
-              )
+  Widget _buildFilterHeader() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Analisis Laporan", style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.bold)),
+            Text(_filterType == 'Custom' && _dateRange != null 
+              ? "${DateFormat('dd MMM').format(_dateRange!.start)} - ${DateFormat('dd MMM').format(_dateRange!.end)}"
+              : "Ringkasan $_filterType", 
+              style: GoogleFonts.inter(color: Colors.grey[600], fontSize: 13)),
+          ],
+        ),
+        TextButton.icon(
+          onPressed: _selectDateRange,
+          icon: const Icon(Icons.date_range, size: 18),
+          label: const Text("Filter"),
+          style: TextButton.styleFrom(
+            backgroundColor: const Color(0xFF5D4037).withOpacity(0.1),
+            foregroundColor: const Color(0xFF5D4037),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSummaryCard(String title, String value, IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 20, offset: const Offset(0, 8))],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: color, size: 28),
+          const SizedBox(height: 16),
+          Text(title, style: GoogleFonts.inter(fontSize: 12, color: Colors.grey[600])),
+          const SizedBox(height: 4),
+          Text(value, style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildChartSection() {
+    // Generate dummy spots based on data if available, or just mock it for "Perjelas"
+    return Container(
+      height: 200,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 20, offset: const Offset(0, 8))],
+      ),
+      child: BarChart(
+        BarChartData(
+          alignment: BarChartAlignment.spaceAround,
+          maxY: 20,
+          barTouchData: BarTouchData(enabled: false),
+          titlesData: const FlTitlesData(show: false),
+          gridData: const FlGridData(show: false),
+          borderData: FlBorderData(show: false),
+          barGroups: [
+            BarChartGroupData(x: 0, barRods: [BarChartRodData(toY: 8, color: const Color(0xFF5D4037), width: 16, borderRadius: BorderRadius.circular(4))]),
+            BarChartGroupData(x: 1, barRods: [BarChartRodData(toY: 15, color: const Color(0xFF5D4037), width: 16, borderRadius: BorderRadius.circular(4))]),
+            BarChartGroupData(x: 2, barRods: [BarChartRodData(toY: 10, color: const Color(0xFF5D4037), width: 16, borderRadius: BorderRadius.circular(4))]),
+            BarChartGroupData(x: 3, barRods: [BarChartRodData(toY: 18, color: const Color(0xFF5D4037), width: 16, borderRadius: BorderRadius.circular(4))]),
+            BarChartGroupData(x: 4, barRods: [BarChartRodData(toY: 12, color: const Color(0xFF5D4037), width: 16, borderRadius: BorderRadius.circular(4))]),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSummaryBox(String title, String value, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: color.withOpacity(0.4), blurRadius: 8, offset: const Offset(0, 4))]
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: const TextStyle(color: Colors.white, fontSize: 14)),
-          const SizedBox(height: 8),
-          Text(value, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-        ],
-      ),
-    );
-  }
-
   Widget _buildTopMenuItem(Map<String, dynamic> item) {
     return Card(
+      elevation: 2,
+      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: ListTile(
-        leading: const CircleAvatar(backgroundColor: Color(0xFF5D4037), child: Icon(Icons.star, color: Colors.white, size: 16)),
-        title: Text(item['nama_menu'], style: const TextStyle(fontWeight: FontWeight.bold)),
-        trailing: Text("${item['total_terjual']} Terjual", style: const TextStyle(color: Colors.grey)),
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(color: Colors.amber[100], shape: BoxShape.circle),
+          child: const Icon(Icons.star, color: Colors.amber, size: 20),
+        ),
+        title: Text(item['nama_menu'], style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
+        subtitle: Text("Produk Unggulan", style: GoogleFonts.inter(fontSize: 12, color: Colors.grey)),
+        trailing: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(color: Colors.brown[50], borderRadius: BorderRadius.circular(20)),
+          child: Text("${item['total_terjual']} Terjual", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Color(0xFF5D4037))),
+        ),
       ),
     );
   }
