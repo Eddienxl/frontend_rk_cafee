@@ -5,6 +5,7 @@ import 'package:frontend_rk_cafee/screens/owner/user_management_screen.dart';
 import 'package:frontend_rk_cafee/screens/owner/laporan_screen.dart';
 import 'package:frontend_rk_cafee/screens/owner/menu_management_screen.dart';
 import 'package:frontend_rk_cafee/screens/owner/bahan_baku_screen.dart';
+import 'package:frontend_rk_cafee/screens/owner/bom_screen.dart';
 import 'package:frontend_rk_cafee/screens/login_screen.dart';
 import 'package:frontend_rk_cafee/services/auth_service.dart';
 import 'package:frontend_rk_cafee/services/owner_service.dart';
@@ -124,7 +125,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               _buildNavCard('Laporan', Icons.analytics_outlined, const LaporanScreen(), Colors.purple),
               _buildNavCard('Kelola Menu', Icons.restaurant_menu, const MenuManagementScreen(), Colors.orange),
               _buildNavCard('Bahan Baku', Icons.inventory_2_outlined, const BahanBakuScreen(), Colors.brown), 
-              // _buildNavCard('Resep (BOM)', Icons.science_outlined, const Center(child: Text("Coming Soon")), Colors.teal),
+              _buildNavCard('Resep (BOM)', Icons.science_outlined, const BOMScreen(), Colors.teal),
             ],
           ),
         ],
