@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_rk_cafee/services/owner_service.dart';
-import 'package:frontend_rk_cafee/models/bahan_baku_model.dart';
+import '../../services/bahan_service.dart';
+import '../../models/bahan_baku_model.dart';
 
 class BahanBakuScreen extends StatefulWidget {
   const BahanBakuScreen({super.key});
@@ -10,7 +10,7 @@ class BahanBakuScreen extends StatefulWidget {
 }
 
 class _BahanBakuScreenState extends State<BahanBakuScreen> {
-  final OwnerService _ownerService = OwnerService();
+  final BahanService _bahanService = BahanService();
   List<BahanBakuModel> _bahanBaku = [];
   bool _isLoading = true;
 
@@ -23,7 +23,7 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
   Future<void> _fetchBahanBaku() async {
     setState(() => _isLoading = true);
     try {
-      final data = await _ownerService.getBahanBaku();
+      final data = await _bahanService.getBahanBaku();
       if (mounted) {
         setState(() {
           _bahanBaku = data;
@@ -77,7 +77,7 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
               if (namaCtrl.text.isEmpty || stokCtrl.text.isEmpty) return;
               Navigator.pop(context);
               
-              final success = await _ownerService.createBahan(
+              final success = await _bahanService.createBahan(
                 nama: namaCtrl.text, 
                 stok: double.tryParse(stokCtrl.text) ?? 0, 
                 satuan: satuan, 
@@ -152,7 +152,7 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
                     if (jumlahCtrl.text.isEmpty) return;
                     Navigator.pop(context);
 
-                    final success = await _ownerService.updateBahanStok(
+                    final success = await _bahanService.updateBahanStok(
                       id: item.id,
                       jumlah: double.tryParse(jumlahCtrl.text) ?? 0,
                       satuanInput: satuanInput, // Kirim satuan yang dipilih user (misal kg)
@@ -185,7 +185,7 @@ class _BahanBakuScreenState extends State<BahanBakuScreen> {
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () async {
               Navigator.pop(context);
-              final success = await _ownerService.deleteBahan(item.id);
+              final success = await _bahanService.deleteBahan(item.id);
               if (success) _fetchBahanBaku();
               else if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Gagal hapus bahan")));
             },

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
-import 'package:frontend_rk_cafee/screens/owner/user_management_screen.dart';
-import 'package:frontend_rk_cafee/screens/owner/laporan_screen.dart';
-import 'package:frontend_rk_cafee/screens/owner/menu_management_screen.dart';
-import 'package:frontend_rk_cafee/screens/owner/bahan_baku_screen.dart';
-import 'package:frontend_rk_cafee/screens/owner/bom_screen.dart';
-import 'package:frontend_rk_cafee/screens/login_screen.dart';
-import 'package:frontend_rk_cafee/services/auth_service.dart';
-import 'package:frontend_rk_cafee/services/owner_service.dart';
+import 'user_management_screen.dart';
+import 'laporan_screen.dart';
+import 'menu_management_screen.dart';
+import 'bahan_baku_screen.dart';
+import 'bom_screen.dart';
+import '../login_screen.dart';
+import '../../services/auth_service.dart';
+import '../../services/laporan_service.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -22,7 +22,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _currentScreen = const Center(child: CircularProgressIndicator()); 
   
   String _username = 'Owner';
-  final OwnerService _ownerService = OwnerService();
+  final LaporanService _laporanService = LaporanService();
   Map<String, dynamic> _summaryData = {}; // Dummy summary data
 
   @override
@@ -46,7 +46,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   void _fetchSummary() async {
     // Simulasi fetch data ringkasan untuk dashboard
-    final data = await _ownerService.getLaporanPenjualan();
+    final data = await _laporanService.getLaporanPenjualan();
     if (mounted) {
       setState(() {
         _summaryData = data;

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'screens/login_screen.dart';
-import 'screens/dashboard_screen.dart';
-import 'screens/kasir_dashboard_screen.dart';
-import 'screens/barista_dashboard_screen.dart';
+import 'screens/owner/owner_dashboard_screen.dart';
+import 'screens/kasir/kasir_dashboard_screen.dart';
+import 'screens/barista/barista_dashboard_screen.dart';
 
 void main() {
   runApp(const MyApp());

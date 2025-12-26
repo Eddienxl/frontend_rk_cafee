@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_rk_cafee/services/owner_service.dart';
+import '../../services/laporan_service.dart';
 import 'package:intl/intl.dart';
 
 class LaporanScreen extends StatefulWidget {
@@ -10,7 +10,7 @@ class LaporanScreen extends StatefulWidget {
 }
 
 class _LaporanScreenState extends State<LaporanScreen> {
-  final OwnerService _ownerService = OwnerService();
+  final LaporanService _laporanService = LaporanService();
   
   // State Filter
   String _filterType = 'Harian'; // Harian, Bulanan, Custom
@@ -30,7 +30,7 @@ class _LaporanScreenState extends State<LaporanScreen> {
     setState(() => _isLoading = true);
     // Simulasi kirim filter ke service (Service dummy ignore filter actually)
     try {
-      final data = await _ownerService.getLaporanPenjualan(
+      final data = await _laporanService.getLaporanPenjualan(
         startDate: _dateRange?.start.toString(),
         endDate: _dateRange?.end.toString()
       );

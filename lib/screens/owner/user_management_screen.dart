@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_rk_cafee/services/owner_service.dart';
-import 'package:frontend_rk_cafee/models/user_model.dart';
+import '../../services/user_service.dart';
+import '../../models/user_model.dart';
 class UserManagementScreen extends StatefulWidget {
   const UserManagementScreen({super.key});
 
@@ -9,7 +9,7 @@ class UserManagementScreen extends StatefulWidget {
 }
 
 class _UserManagementScreenState extends State<UserManagementScreen> {
-  final OwnerService _ownerService = OwnerService();
+  final UserService _userService = UserService();
   List<UserModel> _users = [];
   bool _isLoading = true;
 
@@ -21,7 +21,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
 
   Future<void> _fetchUsers() async {
     try {
-      final users = await _ownerService.getUsers();
+      final users = await _userService.getUsers();
       if (mounted) {
         setState(() {
           _users = users;
@@ -78,14 +78,14 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
               bool success;
               if (user == null) {
                 // Add
-                success = await _ownerService.createUser(
+                success = await _userService.createUser(
                   usernameController.text, 
                   passwordController.text, 
                   selectedRole
                 );
               } else {
                 // Edit
-                success = await _ownerService.updateUser(
+                success = await _userService.updateUser(
                   user.id, 
                   passwordController.text.isEmpty ? null : passwordController.text, 
                   selectedRole
@@ -120,7 +120,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
             onPressed: () async {
               Navigator.pop(context);
               setState(() => _isLoading = true);
-              final success = await _ownerService.deleteUser(user.id);
+              final success = await _userService.deleteUser(user.id);
               if (success) {
                 _fetchUsers();
               } else {

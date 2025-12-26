@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../services/owner_service.dart';
-import '../services/order_service.dart';
-import '../models/menu_model.dart';
-import '../models/cart_item_model.dart';
+import '../../services/menu_service.dart';
+import '../../services/order_service.dart';
+import '../../models/menu_model.dart';
+import '../../models/cart_item_model.dart';
 import 'package:intl/intl.dart';
 
 class KasirDashboardScreen extends StatefulWidget {
@@ -13,7 +13,7 @@ class KasirDashboardScreen extends StatefulWidget {
 }
 
 class _KasirDashboardScreenState extends State<KasirDashboardScreen> {
-  final OwnerService _ownerService = OwnerService(); // Reuse existing service to fetch menus
+  final MenuService _menuService = MenuService();
   final OrderService _orderService = OrderService();
   
   List<MenuModel> _menus = [];
@@ -27,7 +27,7 @@ class _KasirDashboardScreenState extends State<KasirDashboardScreen> {
   }
 
   Future<void> _fetchMenus() async {
-    final menus = await _ownerService.getMenus();
+    final menus = await _menuService.getMenus();
     if (mounted) {
       setState(() {
         _menus = menus.where((m) => m.isAvailable).toList(); // Only show available menus

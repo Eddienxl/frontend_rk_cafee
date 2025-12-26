@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_rk_cafee/services/owner_service.dart';
-import 'package:frontend_rk_cafee/models/menu_model.dart';
+import '../../services/menu_service.dart';
+import '../../models/menu_model.dart';
 import 'package:intl/intl.dart';
 
 class MenuManagementScreen extends StatefulWidget {
@@ -11,7 +11,7 @@ class MenuManagementScreen extends StatefulWidget {
 }
 
 class _MenuManagementScreenState extends State<MenuManagementScreen> {
-  final OwnerService _ownerService = OwnerService();
+  final MenuService _menuService = MenuService();
   List<MenuModel> _menus = [];
   bool _isLoading = true;
   final currencyFormatter = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
@@ -25,7 +25,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
   Future<void> _fetchMenus() async {
     // Panggil service (yang sudah didummikan)
     try {
-      final menus = await _ownerService.getMenus();
+      final menus = await _menuService.getMenus();
       if (mounted) {
         setState(() {
           _menus = menus;
@@ -83,9 +83,9 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
               int harga = int.tryParse(hargaController.text) ?? 0;
 
               if (menu == null) {
-                success = await _ownerService.createMenu(namaController.text, harga, selectedKategori);
+                success = await _menuService.createMenu(namaController.text, harga, selectedKategori);
               } else {
-                success = await _ownerService.updateMenu(menu.id, namaController.text, harga, selectedKategori);
+                success = await _menuService.updateMenu(menu.id, namaController.text, harga, selectedKategori);
               }
 
               if (success) {
@@ -115,7 +115,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
             onPressed: () async {
               Navigator.pop(context);
               setState(() => _isLoading = true);
-              final success = await _ownerService.deleteMenu(menu.id);
+              final success = await _menuService.deleteMenu(menu.id);
                if (success) {
                  _fetchMenus();
                } else {

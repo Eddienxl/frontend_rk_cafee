@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../services/order_service.dart';
-import '../models/order_model.dart';
+import '../../services/order_service.dart';
+import '../../models/order_model.dart';
 import 'package:intl/intl.dart';
 
 class BaristaDashboardScreen extends StatefulWidget {

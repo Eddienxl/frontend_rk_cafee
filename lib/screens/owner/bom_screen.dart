@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_rk_cafee/services/owner_service.dart';
-import 'package:frontend_rk_cafee/models/menu_model.dart';
-import 'package:frontend_rk_cafee/models/bahan_baku_model.dart';
-import 'package:frontend_rk_cafee/models/bom_model.dart';
+import '../../services/bom_service.dart';
+import '../../services/menu_service.dart';
+import '../../services/bahan_service.dart';
+import '../../models/menu_model.dart';
+import '../../models/bahan_baku_model.dart';
+import '../../models/bom_model.dart';
 
 class BOMScreen extends StatefulWidget {
   const BOMScreen({super.key});
@@ -12,7 +14,10 @@ class BOMScreen extends StatefulWidget {
 }
 
 class _BOMScreenState extends State<BOMScreen> {
-  final OwnerService _ownerService = OwnerService();
+  final BOMService _bomService = BOMService();
+  final MenuService _menuService = MenuService();
+  final BahanService _bahanService = BahanService();
+  
   List<BOMModel> _bomList = [];
   List<MenuModel> _menus = [];
   List<BahanBakuModel> _bahanBaku = [];
@@ -27,9 +32,9 @@ class _BOMScreenState extends State<BOMScreen> {
   Future<void> _fetchData() async {
     setState(() => _isLoading = true);
     try {
-      final bomData = await _ownerService.getBOM();
-      final menuData = await _ownerService.getMenus();
-      final bahanData = await _ownerService.getBahanBaku();
+      final bomData = await _bomService.getBOM();
+      final menuData = await _menuService.getMenus();
+      final bahanData = await _bahanService.getBahanBaku();
 
       if (mounted) {
         setState(() {
@@ -98,7 +103,7 @@ class _BOMScreenState extends State<BOMScreen> {
                     if (selectedMenuId == null || selectedBahanId == null || jumlahCtrl.text.isEmpty) return;
                     Navigator.pop(context);
 
-                    final success = await _ownerService.createBOM(
+                    final success = await _bomService.createBOM(
                       selectedMenuId!,
                       selectedBahanId!,
                       double.tryParse(jumlahCtrl.text) ?? 0
@@ -130,7 +135,7 @@ class _BOMScreenState extends State<BOMScreen> {
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () async {
               Navigator.pop(context);
-              final success = await _ownerService.deleteBOM(idBom);
+              final success = await _bomService.deleteBOM(idBom);
                if (success) _fetchData();
               else if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Gagal hapus item")));
             },
