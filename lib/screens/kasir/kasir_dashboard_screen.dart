@@ -13,11 +13,17 @@ class KasirDashboardScreen extends StatefulWidget {
 class _KasirDashboardScreenState extends State<KasirDashboardScreen> {
   final AuthService _authService = AuthService();
   String _username = '';
+  String _role = 'Kasir'; // Default
   int _selectedIndex = 0;
 
   final List<Widget> _screens = [
     const KasirPosScreen(),
     const KasirStatusOrderScreen(),
+  ];
+  
+  final List<String> _titles = [
+    "Buat Pesanan",
+    "Status Pesanan",
   ];
 
   @override
@@ -29,7 +35,8 @@ class _KasirDashboardScreenState extends State<KasirDashboardScreen> {
   Future<void> _loadUserInfo() async {
     final user = await _authService.getUser();
     setState(() {
-      _username = user?['username'] ?? 'Kasir';
+      _username = user['username'] ?? 'Kasir';
+      _role = user['role'] ?? 'Kasir';
     });
   }
 
@@ -37,6 +44,7 @@ class _KasirDashboardScreenState extends State<KasirDashboardScreen> {
     setState(() {
       _selectedIndex = index;
     });
+    Navigator.pop(context); // Close Drawer
   }
 
   void _logout() async {
@@ -48,38 +56,47 @@ class _KasirDashboardScreenState extends State<KasirDashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text("Kasir Dashboard", style: TextStyle(fontWeight: FontWeight.bold)),
-            Text("Halo, $_username", style: const TextStyle(fontSize: 14)),
-          ],
-        ),
+        title: Text(_titles[_selectedIndex], style: const TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.brown,
         foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: _logout,
-          ),
-        ],
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            UserAccountsDrawerHeader(
+              decoration: const BoxDecoration(color: Colors.brown),
+              accountName: Text(_username, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              accountEmail: Text(_role),
+              currentAccountPicture: const CircleAvatar(
+                backgroundColor: Colors.white,
+                child: Icon(Icons.person, size: 40, color: Colors.brown),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.point_of_sale, color: Colors.brown),
+              title: const Text("Buat Pesanan"),
+              selected: _selectedIndex == 0,
+              selectedColor: Colors.amber[900],
+              onTap: () => _onItemTapped(0),
+            ),
+            ListTile(
+              leading: const Icon(Icons.receipt_long, color: Colors.brown),
+              title: const Text("Status Pesanan"),
+              selected: _selectedIndex == 1,
+              selectedColor: Colors.amber[900],
+              onTap: () => _onItemTapped(1),
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.red),
+              title: const Text("Keluar", style: TextStyle(color: Colors.red)),
+              onTap: _logout,
+            ),
+          ],
+        ),
       ),
       body: _screens[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.point_of_sale),
-            label: 'Buat Pesanan',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.receipt_long),
-            label: 'Status Pesanan',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.brown,
-        onTap: _onItemTapped,
-      ),
     );
   }
 }

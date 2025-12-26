@@ -1,0 +1,31 @@
+Analyzing RK_CAFEE_APP_FE...                                    
+
+   info - Statements in an if should be enclosed in a block - lib\screens\barista\barista_dashboard_screen.dart:51:34 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\barista\barista_dashboard_screen.dart:52:48 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\barista\barista_dashboard_screen.dart:53:10 - curly_braces_in_flow_control_structures
+   info - The private field _cart could be 'final' - lib\screens\kasir\kasir_pos_screen.dart:28:23 - prefer_final_fields
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\kasir\kasir_pos_screen.dart:291:65 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\kasir\kasir_status_order_screen.dart:104:40 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre - lib\screens\owner\bahan_baku_screen.dart:65:17 - deprecated_member_use
+   info - Statements in an if should be enclosed in a block - lib\screens\owner\bahan_baku_screen.dart:87:28 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\owner\bahan_baku_screen.dart:88:33 - curly_braces_in_flow_control_structures
+   info - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre - lib\screens\owner\bahan_baku_screen.dart:132:21 - deprecated_member_use
+   info - Statements in an if should be enclosed in a block - lib\screens\owner\bahan_baku_screen.dart:162:34 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\owner\bahan_baku_screen.dart:163:39 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\owner\bahan_baku_screen.dart:189:28 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\owner\bahan_baku_screen.dart:190:33 - curly_braces_in_flow_control_structures
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\owner\bahan_baku_screen.dart:309:78 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre - lib\screens\owner\bom_screen.dart:75:23 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre - lib\screens\owner\bom_screen.dart:82:23 - deprecated_member_use
+   info - Statements in an if should be enclosed in a block - lib\screens\owner\bom_screen.dart:112:34 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\owner\bom_screen.dart:113:39 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\owner\bom_screen.dart:139:29 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\owner\bom_screen.dart:140:33 - curly_braces_in_flow_control_structures
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\owner\laporan_screen.dart:196:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\owner\owner_dashboard_screen.dart:143:40 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\owner\owner_dashboard_screen.dart:145:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\owner\owner_dashboard_screen.dart:152:28 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\owner\owner_dashboard_screen.dart:184:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\owner\owner_dashboard_screen.dart:193:32 - deprecated_member_use
+   info - Use interpolation to compose strings and values - lib\services\menu_service.dart:43:22 - prefer_interpolation_to_compose_strings
+

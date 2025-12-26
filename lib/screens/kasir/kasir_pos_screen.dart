@@ -253,10 +253,10 @@ class _KasirPosScreenState extends State<KasirPosScreen> {
                 : GridView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2, // 2 column for Mobile look
-                      childAspectRatio: 0.75,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
+                      crossAxisCount: 3, // 3 Columns for compact layout
+                      childAspectRatio: 0.7, 
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
                     ),
                     itemCount: filteredMenus.length,
                     itemBuilder: (context, index) {
